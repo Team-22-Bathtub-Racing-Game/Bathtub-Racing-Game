@@ -3,7 +3,7 @@ using System.Collections;
 
 /// <summary>
 /// Physics & Collisions
-/// PhysicsController: Uses Unity’s physics engine to apply forces and detect collisions
+/// PhysicsController: Uses Unity’s physics engine to apply forces and detect collisions.
 /// </summary>
 [RequireComponent(typeof(Rigidbody))]
 public class PhysicsController : MonoBehaviour
@@ -18,6 +18,8 @@ public class PhysicsController : MonoBehaviour
     [Header("Weight Settings")]
     public WeightClass weightClass = WeightClass.Medium;
     private float weightFactor;
+    private float slopeFactor;
+    private float handlingFactor;
 
     [Header("Drift & Boost")]
     public float driftMultiplier = 1.5f;
@@ -31,48 +33,67 @@ public class PhysicsController : MonoBehaviour
     public float bobAmount = 0.05f;
     public float bobSpeed = 4f;
 
-    [Header("Kart Lean")]
-    public Transform Kart;
-    public float leanAmount = 10f;
-    public float leanSpeed = 5f;
+    [Header("Collision Effects")]
+    public AudioSource collisionSound;
+    public ParticleSystem collisionParticles;
+    public float collisionShakeIntensity = 0.15f;
+    public float collisionShakeDuration = 0.3f;
+    public float collisionSlowdownFactor = 0.6f;
 
     [Header("Boost Particle (Optional)")]
     public ParticleSystem boostParticles;
 
     [Header("Stabilization Settings")]
-    public float distanceToGround = 0.6f;  // half of kart height
-    public float groundForce = 50f;        // downward stabilizing force
+    public float distanceToGround = 0.6f;
+    public float groundForce = 50f;
+
+    // UI
+    private GUIStyle weightLabelStyle;
 
     private Rigidbody rb;
     private float moveInput;
     private float turnInput;
     private Vector3 camDefaultLocalPos;
     private bool isBoosting = false;
+    private bool isShaking = false;
 
     void Awake()
     {
         rb = GetComponent<Rigidbody>();
-        rb.centerOfMass = new Vector3(0f, -0.6f, 0f);  // lower for stability
+        rb.centerOfMass = new Vector3(0f, -0.6f, 0f);
         rb.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
         rb.interpolation = RigidbodyInterpolation.Interpolate;
         rb.collisionDetectionMode = CollisionDetectionMode.Continuous;
 
-        // Apply weight settings
+        // Weight class behavior setup
         switch (weightClass)
         {
             case WeightClass.Light:
                 rb.mass = 0.8f;
-                weightFactor = 0.7f; // wider turns, faster acceleration
+                weightFactor = 0.8f;  // lighter body
+                slopeFactor = 0.8f;   // slower slope response
+                handlingFactor = 0.8f; // wider turns
                 break;
             case WeightClass.Medium:
                 rb.mass = 1.5f;
-                weightFactor = 1f; // balanced
+                weightFactor = 1f;
+                slopeFactor = 1f;
+                handlingFactor = 1f;
                 break;
             case WeightClass.Heavy:
                 rb.mass = 2.5f;
-                weightFactor = 1.4f; // tighter turns, slower acceleration
+                weightFactor = 1.3f;  // faster top speed
+                slopeFactor = 1.2f;   // stronger on slopes
+                handlingFactor = 1.3f; // tighter turns
                 break;
         }
+
+        weightLabelStyle = new GUIStyle
+        {
+            fontSize = 22,
+            fontStyle = FontStyle.Bold,
+            normal = new GUIStyleState { textColor = Color.white }
+        };
 
         if (playerCamera != null)
         {
@@ -90,71 +111,86 @@ public class PhysicsController : MonoBehaviour
     {
         UpdatePosition();
         HandleCamera();
-        HandleKartLean();
         StabilizeKart();
     }
 
-    /// <summary>
-    /// Apply player input to the kart
-    /// </summary>
     void ApplyInput()
     {
         moveInput = Input.GetAxis("Vertical");
         turnInput = Input.GetAxis("Horizontal");
 
-        // Drift input
         if (Input.GetKey(KeyCode.LeftShift))
             turnInput *= driftMultiplier;
 
-        // Boost input
         if (Input.GetKeyDown(KeyCode.Space) && !isBoosting)
             StartCoroutine(BoostCoroutine());
     }
 
-    /// <summary>
-    /// Apply physics forces to move the kart
-    /// </summary>
     void UpdatePosition()
     {
         float currentAcceleration = acceleration * (1f / weightFactor);
         if (isBoosting) currentAcceleration *= boostMultiplier;
 
-        // Forward/backward motion
-        if (Mathf.Abs(moveInput) > 0.01f)
-            ApplyForce(Kart, transform.forward * moveInput * currentAcceleration);
+        // --- Ground detection and slope alignment ---
+        RaycastHit hit;
+        bool grounded = Physics.Raycast(transform.position + Vector3.up * 0.2f, Vector3.down, out hit, 1.5f);
 
-        // Clamp speed
-        float currentMaxSpeed = ComputeTopSpeed() * (isBoosting ? boostMultiplier : 1f);
-        if (rb.velocity.magnitude > currentMaxSpeed)
-            rb.velocity = rb.velocity.normalized * currentMaxSpeed;
-
-        // Turning
-        if (Mathf.Abs(moveInput) > 0.01f)
+        if (grounded)
         {
-            // Wider turns for lighter karts
-            float adjustedHandling = handling / weightFactor;
-            float turnAngle = turnInput * adjustedHandling * Time.fixedDeltaTime * Mathf.Sign(moveInput);
-            rb.MoveRotation(rb.rotation * Quaternion.Euler(0f, turnAngle, 0f));
+            // Align kart with terrain slope normal
+            Quaternion slopeRotation = Quaternion.FromToRotation(transform.up, hit.normal) * transform.rotation;
+            rb.MoveRotation(Quaternion.Slerp(rb.rotation, slopeRotation, Time.fixedDeltaTime * 8f));
+
+            // Calculate slope direction for movement
+            Vector3 slopeForward = Vector3.ProjectOnPlane(transform.forward, hit.normal).normalized;
+
+            // Uphill / Downhill adjustment
+            float slopeDot = Vector3.Dot(hit.normal, Vector3.up);
+            float slopeAngle = Vector3.Angle(hit.normal, Vector3.up);
+
+            float slopeAdjustment = 1f;
+            if (slopeAngle > 0.1f)
+            {
+                if (Vector3.Dot(slopeForward, Vector3.up) < 0) // Uphill
+                    slopeAdjustment = 1f / slopeFactor;
+                else // Downhill
+                    slopeAdjustment = slopeFactor;
+            }
+
+            // Forward motion along slope
+            if (Mathf.Abs(moveInput) > 0.01f)
+            {
+                Vector3 force = slopeForward * moveInput * currentAcceleration * slopeAdjustment;
+                rb.AddForce(force, ForceMode.Acceleration);
+            }
+
+            // Clamp speed
+            float currentMaxSpeed = speed * weightFactor * (isBoosting ? boostMultiplier : 1f);
+            if (rb.velocity.magnitude > currentMaxSpeed)
+                rb.velocity = rb.velocity.normalized * currentMaxSpeed;
+
+            // Turning
+            if (Mathf.Abs(moveInput) > 0.01f)
+            {
+                float adjustedHandling = handling * handlingFactor;
+                float turnAngle = turnInput * adjustedHandling * Time.fixedDeltaTime * Mathf.Sign(moveInput);
+                rb.MoveRotation(rb.rotation * Quaternion.Euler(0f, turnAngle, 0f));
+            }
+        }
+        else
+        {
+            // Apply slight downward pull if airborne
+            rb.AddForce(Vector3.down * groundForce * 0.5f, ForceMode.Acceleration);
         }
     }
 
-    /// <summary>
-    /// Applies a force to the kart using Unity physics
-    /// </summary>
-    void ApplyForce(Transform Kart, Vector3 force)
-    {
-        rb.AddForce(force, ForceMode.Acceleration);
-    }
 
-    /// <summary>
-    /// Camera tilt and bobbing effects
-    /// </summary>
     void HandleCamera()
     {
         if (playerCamera == null) return;
 
-        float driftMultiplier = Input.GetKey(KeyCode.LeftShift) ? 1.5f : 1f;
-        float sideTilt = -turnInput * tiltAmount * driftMultiplier;
+        float driftTilt = Input.GetKey(KeyCode.LeftShift) ? 1.5f : 1f;
+        float sideTilt = -turnInput * tiltAmount * driftTilt;
 
         playerCamera.localRotation = Quaternion.Slerp(
             playerCamera.localRotation,
@@ -168,32 +204,13 @@ public class PhysicsController : MonoBehaviour
         playerCamera.localPosition = Vector3.Lerp(playerCamera.localPosition, basePos + new Vector3(0f, bobOffset, 0f), Time.deltaTime * 10f);
     }
 
-    /// <summary>
-    /// Kart model lean when turning
-    /// </summary>
-    void HandleKartLean()
-    {
-        if (Kart == null) return;
-
-        float targetLean = -turnInput * leanAmount;
-        Kart.localRotation = Quaternion.Slerp(Kart.localRotation, Quaternion.Euler(0f, 0f, targetLean), Time.deltaTime * leanSpeed);
-    }
-
-    /// <summary>
-    /// Stabilizes the kart to prevent it from floating or flipping during collisions
-    /// </summary>
     void StabilizeKart()
     {
         Ray ray = new Ray(transform.position, Vector3.down);
         if (!Physics.Raycast(ray, distanceToGround))
-        {
             rb.AddForce(Vector3.down * groundForce, ForceMode.Acceleration);
-        }
     }
 
-    /// <summary>
-    /// Boost coroutine
-    /// </summary>
     IEnumerator BoostCoroutine()
     {
         isBoosting = true;
@@ -203,6 +220,51 @@ public class PhysicsController : MonoBehaviour
         if (boostParticles != null) boostParticles.Stop();
     }
 
-    float ComputeTopSpeed() => speed;
-    float ComputeHandling() => handling;
+    // Handle collisions
+    void OnCollisionEnter(Collision collision)
+    {
+        float impactForce = collision.relativeVelocity.magnitude;
+
+        if (impactForce > 2f)
+        {
+            // Play sound
+            if (collisionSound != null)
+                collisionSound.Play();
+
+            // Particles
+            if (collisionParticles != null)
+                collisionParticles.Play();
+
+            // Small speed penalty
+            rb.velocity *= collisionSlowdownFactor;
+
+            // Camera shake
+            if (!isShaking && playerCamera != null)
+                StartCoroutine(CameraShake());
+        }
+    }
+
+    IEnumerator CameraShake()
+    {
+        isShaking = true;
+        Vector3 originalPos = playerCamera.localPosition;
+
+        float elapsed = 0f;
+        while (elapsed < collisionShakeDuration)
+        {
+            float x = Random.Range(-collisionShakeIntensity, collisionShakeIntensity);
+            float y = Random.Range(-collisionShakeIntensity, collisionShakeIntensity);
+            playerCamera.localPosition = new Vector3(originalPos.x + x, originalPos.y + y, originalPos.z);
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        playerCamera.localPosition = originalPos;
+        isShaking = false;
+    }
+
+    void OnGUI()
+    {
+        GUI.Label(new Rect(20, 20, 300, 30), $"Weight Class: {weightClass}", weightLabelStyle);
+    }
 }
