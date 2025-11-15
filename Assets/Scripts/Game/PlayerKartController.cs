@@ -140,7 +140,7 @@ public class PhysicsController : MonoBehaviour
         // --- Ground detection and slope alignment ---
         RaycastHit hit;
         bool grounded = Physics.Raycast(transform.position + Vector3.up * 0.2f, Vector3.down, out hit, 1.5f);
-
+        
         if (grounded)
         {
             // Align kart with terrain slope normal
@@ -229,7 +229,8 @@ public class PhysicsController : MonoBehaviour
     // Handle collisions
     void OnCollisionEnter(Collision collision)
     {
-        float impactForce = collision.relativeVelocity.magnitude;
+        Debug.Log("collision");
+        /*float impactForce = collision.relativeVelocity.magnitude;
 
         if (impactForce > 2f)
         {
@@ -247,7 +248,7 @@ public class PhysicsController : MonoBehaviour
             // Camera shake
             if (!isShaking && playerCamera != null)
                 StartCoroutine(CameraShake());
-        }
+        }*/
     }
 
     IEnumerator CameraShake()
