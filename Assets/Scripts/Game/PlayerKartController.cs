@@ -1,11 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-/// <summary>
-/// Physics & Collisions
-/// PhysicsController: Uses Unity’s physics engine to apply forces and detect collisions.
-/// </summary>
+
 [RequireComponent(typeof(Rigidbody))]
+
 public class PhysicsController : MonoBehaviour
 {
     [Header("Kart Stats")]
@@ -14,6 +12,8 @@ public class PhysicsController : MonoBehaviour
     public float speed = 20f;
 
     public enum WeightClass { Light, Medium, Heavy }
+    public bool canDrive = false;   // stops kart from moving until countdown is done
+
 
     [Header("Weight Settings")]
     public WeightClass weightClass = WeightClass.Medium;
@@ -128,6 +128,12 @@ public class PhysicsController : MonoBehaviour
 
     void UpdatePosition()
     {
+        if (!canDrive)
+        {
+            rb.velocity = Vector3.zero;    // keeps kart still
+            return;
+        }
+
         float currentAcceleration = acceleration * (1f / weightFactor);
         if (isBoosting) currentAcceleration *= boostMultiplier;
 
