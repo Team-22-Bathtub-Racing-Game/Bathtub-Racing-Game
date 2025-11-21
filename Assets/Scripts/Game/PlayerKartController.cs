@@ -229,26 +229,30 @@ public class PhysicsController : MonoBehaviour
     // Handle collisions
     void OnCollisionEnter(Collision collision)
     {
-        Debug.Log("collision");
-        /*float impactForce = collision.relativeVelocity.magnitude;
+        Debug.Log("collision with terrain object " + collision.gameObject.name);
+		if(collision.collider.tag != "Terrain")
+		{
+			Debug.Log("collided with non-terrain object " + collision.gameObject.name);
+        	float impactForce = collision.relativeVelocity.magnitude;
 
-        if (impactForce > 2f)
-        {
-            // Play sound
-            if (collisionSound != null)
-                collisionSound.Play();
+        	if (impactForce > 2f)
+        	{
+            	// Play sound
+            	if (collisionSound != null)
+                	collisionSound.Play();
 
             // Particles
-            if (collisionParticles != null)
-                collisionParticles.Play();
+            	if (collisionParticles != null)
+                	collisionParticles.Play();
 
-            // Small speed penalty
-            rb.velocity *= collisionSlowdownFactor;
+            	// Small speed penalty
+            	rb.velocity *= collisionSlowdownFactor;
 
-            // Camera shake
-            if (!isShaking && playerCamera != null)
-                StartCoroutine(CameraShake());
-        }*/
+            	// Camera shake
+            	if (!isShaking && playerCamera != null)
+              	  	StartCoroutine(CameraShake());
+        	}
+		}
     }
 
     IEnumerator CameraShake()
