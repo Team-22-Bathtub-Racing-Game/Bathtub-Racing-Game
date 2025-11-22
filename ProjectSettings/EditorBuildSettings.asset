@@ -5,22 +5,22 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Main Menu.unity
     guid: 1b0f14072baf4484fb9bdece23419553
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Loading Screen.unity
     guid: 89c9932443cffdb42a0fad6936d7dee2
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Menu - Selection Screen.unity
     guid: 00b2316a91e0c31438db1a90039f0971
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Menu - Components.unity
     guid: b94dc7ea18d78904cb26920589857ef3
   - enabled: 1
     path: Assets/Scenes/SPSU - Track 1 (1993).unity
     guid: 99c9720ab356a0642a771bea13969a05
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/SPSU - Track 2 (2025).unity
     guid: 2714a4f63c72f7144b0bba7bd12c6a5f
   m_configObjects:
