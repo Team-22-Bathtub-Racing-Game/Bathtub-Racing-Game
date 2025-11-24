@@ -6,7 +6,7 @@ public class CountdownManager : MonoBehaviour
 {
     public TMP_Text countdownText;
     public RaceTimer raceTimer;     // assign race timer
-    public PhysicsController playerKart;  // assign player's kart controller
+    public PlayerKartController playerKart;  // assign player's kart controller
 
     void Start()
     {
