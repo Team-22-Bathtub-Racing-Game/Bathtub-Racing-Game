@@ -781,7 +781,7 @@ GameObject:
   - component: {fileID: 7315694226243974784}
   - component: {fileID: 2564448823009529907}
   - component: {fileID: 2460581158718737828}
-  - component: {fileID: 4068041328769729619}
+  - component: {fileID: 7384471359639859777}
   m_Layer: 0
   m_Name: PlayerKart
   m_TagString: Player
@@ -797,14 +797,14 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2408756819768996437}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0.1526497, z: -0, w: -0.9882804}
-  m_LocalPosition: {x: 372.5, y: 21.109, z: 480.27902}
+  m_LocalRotation: {x: -0.048845, y: 0.15182054, z: 0.005512463, w: -0.98718506}
+  m_LocalPosition: {x: 370.119, y: 20.841, z: 480.27902}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1925741078186378877}
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 342.439, z: 0}
+  m_LocalEulerAnglesHint: {x: 5.438, y: 342.444, z: -1.48}
 --- !u!54 &2564448823009529907
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -813,9 +813,9 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2408756819768996437}
   serializedVersion: 4
-  m_Mass: 1
-  m_Drag: 0.3
-  m_AngularDrag: 3
+  m_Mass: 120
+  m_Drag: 0.1
+  m_AngularDrag: 0.6
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
@@ -830,7 +830,7 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 1
-  m_Constraints: 64
+  m_Constraints: 0
   m_CollisionDetection: 1
 --- !u!114 &2460581158718737828
 MonoBehaviour:
@@ -857,21 +857,20 @@ MonoBehaviour:
   tiltSpeed: 5
   bobAmount: 0.05
   bobSpeed: 4
-  collisionSound: {fileID: 0}
-  collisionParticles: {fileID: 0}
   collisionShakeIntensity: 0.15
-  collisionShakeDuration: 0.3
-  collisionSlowdownFactor: 0.6
-  boostParticles: {fileID: 0}
+  collisionShakeDuration: 0.25
   engineAudio: {fileID: 0}
   driftAudio: {fileID: 0}
   engineMinPitch: 0.8
   engineMaxPitch: 2
   engineBoostPitch: 0.3
-  distanceToGround: 0.6
+  collisionSound: {fileID: 0}
+  collisionParticles: {fileID: 0}
+  collisionSlowdownFactor: 0.6
+  boostParticles: {fileID: 0}
   groundForce: 50
---- !u!136 &4068041328769729619
-CapsuleCollider:
+--- !u!65 &7384471359639859777
+BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -888,11 +887,9 @@ CapsuleCollider:
   m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.3437978
-  m_Height: 3
-  m_Direction: 2
-  m_Center: {x: -0.0000000104311475, y: -0.6837977, z: 1}
+  serializedVersion: 3
+  m_Size: {x: 1.0403687, y: 1.5701921, z: 2.8964624}
+  m_Center: {x: 0.040172156, y: -0.17584598, z: 0.7018428}
 --- !u!1 &2599214020108384032
 GameObject:
   m_ObjectHideFlags: 0
@@ -1821,7 +1818,7 @@ Transform:
   m_GameObject: {fileID: 7490806989152404161}
   serializedVersion: 2
   m_LocalRotation: {x: -0.2139271, y: 0.004038274, z: 0.006155989, w: -0.9768219}
-  m_LocalPosition: {x: 0.007, y: 0.23, z: 0.181}
+  m_LocalPosition: {x: -0, y: 0.44, z: 0.16}
   m_LocalScale: {x: 0.8474385, y: 0.9146492, z: 0.5127179}
   m_ConstrainProportionsScale: 0
   m_Children: []
