@@ -798,7 +798,7 @@ Transform:
   m_GameObject: {fileID: 2408756819768996437}
   serializedVersion: 2
   m_LocalRotation: {x: -0.048845, y: 0.15182054, z: 0.005512463, w: -0.98718506}
-  m_LocalPosition: {x: 370.119, y: 20.841, z: 480.27902}
+  m_LocalPosition: {x: 370.7675, y: 20.38, z: 488.02682}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -844,10 +844,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c0865e0ac2684164aa3bf0b2aa1b9b18, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  acceleration: 30
-  handling: 90
-  speed: 20
-  weightClass: 2
+  acceleration: 25
+  handling: 75
+  speed: 15
+  weightClass: 0
   canDrive: 1
   driftMultiplier: 1.5
   boostMultiplier: 1.5
@@ -888,8 +888,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1.0403687, y: 1.5701921, z: 2.8964624}
-  m_Center: {x: 0.040172156, y: -0.17584598, z: 0.7018428}
+  m_Size: {x: 1.0403687, y: 1.6960571, z: 2.8964624}
+  m_Center: {x: 0.040172145, y: -0.23877847, z: 0.7018428}
 --- !u!1 &2599214020108384032
 GameObject:
   m_ObjectHideFlags: 0
