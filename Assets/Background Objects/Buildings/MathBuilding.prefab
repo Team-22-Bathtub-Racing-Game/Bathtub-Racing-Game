@@ -32,12 +32,9 @@ Transform:
   m_LocalScale: {x: 70, y: 14, z: 20}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 2959765076790067971}
-  - {fileID: 251474110327812559}
   - {fileID: 2354258577341657992}
   - {fileID: 5601595702422416673}
   - {fileID: 2794632491843783394}
-  - {fileID: 5613944851372343806}
   - {fileID: 85828788371883823}
   - {fileID: 3697834385447262779}
   - {fileID: 8281206956950031015}
@@ -1188,7 +1185,6 @@ Transform:
   m_PrefabInstance: {fileID: 4479345446380101575}
   m_PrefabAsset: {fileID: 0}
 <<<<<<< HEAD
-<<<<<<< HEAD
 --- !u!1001 &4571177107783879535
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1269,8 +1265,6 @@ Transform:
   m_PrefabAsset: {fileID: 0}
 =======
 >>>>>>> parent of 6b77e1e (Additional buildings and assets)
-=======
->>>>>>> parent of e47a219 (Rollback)
 --- !u!1001 &5337237872608023779
 PrefabInstance:
   m_ObjectHideFlags: 0
