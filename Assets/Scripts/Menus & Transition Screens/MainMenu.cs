@@ -10,6 +10,11 @@ public class MainMenu : MonoBehaviour
         SceneManager.LoadScene("Racetrack");
     }
 
+    public void SelectTrack()
+    {
+        SceneManager.LoadScene("TrackSelection");
+    }
+
     public void LoadCustomizationPage()
     {
         SceneManager.LoadScene("KartCustomization");
