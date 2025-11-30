@@ -7,7 +7,22 @@ public class MainMenu : MonoBehaviour
 {
     public void PlayGame()
     {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+        SceneManager.LoadScene("Racetrack");
+    }
+
+    public void LoadCustomizationPage()
+    {
+        SceneManager.LoadScene("KartCustomization");
+    }
+
+    public void About()
+    {
+        Application.OpenURL("https://team-22-bathtub-racing-game.github.io/Website/");
+    }
+
+    public void LoadMainMenu()
+    {
+        SceneManager.LoadScene("MainMenu");
     }
 
     public void QuitGame()
