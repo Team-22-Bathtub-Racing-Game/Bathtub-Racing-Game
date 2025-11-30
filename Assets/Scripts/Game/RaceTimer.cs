@@ -20,9 +20,9 @@ public class RaceTimer : MonoBehaviour
     {
         int minutes = Mathf.FloorToInt(raceTime / 60);
         int seconds = Mathf.FloorToInt(raceTime % 60);
-        int milliseconds = Mathf.FloorToInt((raceTime * 1000) % 1000);
+        int milliseconds = Mathf.FloorToInt((raceTime * 100) % 100);
 
-        timerText.text = $"{minutes:00}:{seconds:00}:{milliseconds:000}";
+        timerText.text = $"{minutes:00}:{seconds:00}:{milliseconds:00}";
     }
 
     public void StartRace() => raceActive = true;
