@@ -1,0 +1,39 @@
+using UnityEngine;
+
+// Serializable kart class
+[System.Serializable]
+public class CustomKart
+{
+    public RollCageType RollCage;
+    public WheelType Wheel;
+    public ExtraDetailType ExtraDetail;
+    public DecalType Decal;
+    public string KartName;
+    public string DriverName;
+    public Color MainColor;
+    public Color TrimColor;
+    public Color DecalColor;
+
+    public CustomKart() { }
+}
+
+// Enums for customization
+public enum WheelType
+{
+    Large = 0, Small = 1, Combo = 2
+}
+
+public enum RollCageType
+{
+    Round = 0, Box = 1, Slim = 2
+}
+
+public enum ExtraDetailType
+{
+    None = 0, FrontWing = 1
+}
+
+public enum DecalType
+{
+    None = 0, Stripes = 1, Flames = 2
+}

@@ -4,7 +4,7 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody))]
 public class OpponentKartAI : MonoBehaviour
 {
-    [Header ("Waypoint initizer")]
+    [Header("Waypoint initizer")]
     public WaypointContainer waypointContainer;
     public List<Transform> waypoints;
     public int currentWaypoint;
@@ -29,7 +29,7 @@ public class OpponentKartAI : MonoBehaviour
         rb.interpolation = RigidbodyInterpolation.Interpolate;
         rb.collisionDetectionMode = CollisionDetectionMode.Continuous;
 
-        
+
         waypoints = waypointContainer.waypoints;
         currentWaypoint = 0;
     }

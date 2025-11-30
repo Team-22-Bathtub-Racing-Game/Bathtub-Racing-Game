@@ -14,7 +14,7 @@ public class PlayerKartController : MonoBehaviour
     public WeightClass weightClass = WeightClass.Medium;
 
     [Header("Driving State")]
-    public bool canDrive = false;   // set true from countdown or in Inspector
+    public bool canDrive = false;
 
     private float weightFactor;
     private float slopeFactor;
@@ -33,7 +33,7 @@ public class PlayerKartController : MonoBehaviour
     public float bobSpeed = 4f;
 
     [Header("Camera Shake")]
-    public float collisionShakeIntensity = 0.15f;
+    public float collisionShakeIntensity = 0.05f;
     public float collisionShakeDuration = 0.25f;
 
     [Header("Engine & Drift Audio")]
@@ -63,6 +63,9 @@ public class PlayerKartController : MonoBehaviour
     private bool isBoosting = false;
     private bool isShaking = false;
 
+    // NEW: Keeps the speed constant when W is released
+    private float retainedSpeed = 0f;
+
     // GUI
     private GUIStyle weightLabelStyle;
 
@@ -71,13 +74,11 @@ public class PlayerKartController : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         col = GetComponent<Collider>();
 
-        // Slightly lowered center of mass for stability
         rb.centerOfMass = new Vector3(0, -0.6f, 0);
         rb.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
         rb.interpolation = RigidbodyInterpolation.Interpolate;
         rb.collisionDetectionMode = CollisionDetectionMode.Continuous;
 
-        // Weight class setup
         switch (weightClass)
         {
             case WeightClass.Light:
@@ -102,7 +103,6 @@ public class PlayerKartController : MonoBehaviour
                 break;
         }
 
-        // GUI
         weightLabelStyle = new GUIStyle
         {
             fontSize = 22,
@@ -110,7 +110,6 @@ public class PlayerKartController : MonoBehaviour
             normal = new GUIStyleState { textColor = Color.white }
         };
 
-        // Camera
         if (playerCamera != null)
         {
             camDefaultLocalPos = playerCamera.localPosition;
@@ -131,13 +130,11 @@ public class PlayerKartController : MonoBehaviour
         StabilizeKart();
     }
 
-    // ---------------- INPUT ----------------
     void ApplyInput()
     {
         moveInput = Input.GetAxis("Vertical");
         turnInput = Input.GetAxis("Horizontal");
 
-        // Drift
         if (Input.GetKey(KeyCode.LeftShift))
         {
             turnInput *= driftMultiplier;
@@ -149,12 +146,10 @@ public class PlayerKartController : MonoBehaviour
             driftAudio.Stop();
         }
 
-        // Boost
         if (Input.GetKeyDown(KeyCode.Space) && !isBoosting)
             StartCoroutine(BoostCoroutine());
     }
 
-    // ---------------- ENGINE AUDIO ----------------
     void UpdateEngineSound()
     {
         if (engineAudio == null) return;
@@ -167,7 +162,6 @@ public class PlayerKartController : MonoBehaviour
             engineAudio.pitch += engineBoostPitch;
     }
 
-    // ---------------- MOVEMENT & SLOPES ----------------
     void UpdatePosition()
     {
         if (!canDrive)
@@ -179,7 +173,6 @@ public class PlayerKartController : MonoBehaviour
         float currentAcceleration = acceleration * (1f / weightFactor);
         if (isBoosting) currentAcceleration *= boostMultiplier;
 
-        // Use collider bounds so it works with any BoxCollider size
         float halfHeight = col != null ? col.bounds.extents.y : 1f;
         Vector3 rayStart = col != null ? col.bounds.center + Vector3.up * 0.1f
                                        : transform.position + Vector3.up * 0.1f;
@@ -189,26 +182,49 @@ public class PlayerKartController : MonoBehaviour
 
         if (grounded)
         {
-            // Align to the ground normal (slopes)
             Quaternion slopeRotation = Quaternion.FromToRotation(transform.up, hit.normal) * transform.rotation;
             rb.MoveRotation(Quaternion.Slerp(rb.rotation, slopeRotation, Time.fixedDeltaTime * 10f));
 
-            // Move along slope
             Vector3 slopeForward = Vector3.ProjectOnPlane(transform.forward, hit.normal).normalized;
 
-            if (Mathf.Abs(moveInput) > 0.01f)
+            // ---------------- CONSTANT SPEED SYSTEM (GROUND) ----------------
+            if (moveInput > 0.1f)
+            {
+                Vector3 force = slopeForward * currentAcceleration * slopeFactor;
+                rb.AddForce(force, ForceMode.Acceleration);
+                retainedSpeed = rb.velocity.magnitude;
+            }
+            else if (moveInput < -0.1f)
             {
                 Vector3 force = slopeForward * moveInput * currentAcceleration * slopeFactor;
                 rb.AddForce(force, ForceMode.Acceleration);
+                retainedSpeed = rb.velocity.magnitude;
+            }
+            else
+            {
+                if (rb.velocity.magnitude < retainedSpeed)
+                    rb.velocity = rb.velocity.normalized * retainedSpeed;
             }
         }
         else
         {
-            // Fallback: still allow forward motion in the air
-            if (Mathf.Abs(moveInput) > 0.01f)
+            // ---------------- CONSTANT SPEED SYSTEM (AIR) ----------------
+            if (moveInput > 0.1f)
+            {
+                Vector3 force = transform.forward * currentAcceleration;
+                rb.AddForce(force, ForceMode.Acceleration);
+                retainedSpeed = rb.velocity.magnitude;
+            }
+            else if (moveInput < -0.1f)
             {
                 Vector3 force = transform.forward * moveInput * currentAcceleration;
                 rb.AddForce(force, ForceMode.Acceleration);
+                retainedSpeed = rb.velocity.magnitude;
+            }
+            else
+            {
+                if (rb.velocity.magnitude < retainedSpeed)
+                    rb.velocity = rb.velocity.normalized * retainedSpeed;
             }
         }
 
@@ -218,15 +234,19 @@ public class PlayerKartController : MonoBehaviour
             rb.velocity = rb.velocity.normalized * currentMaxSpeed;
 
         // Turning
-        if (Mathf.Abs(moveInput) > 0.01f)
+        float adjustedHandling = handling * handlingFactor;
+        float turnAngle = turnInput * adjustedHandling * Time.fixedDeltaTime;
+        rb.MoveRotation(rb.rotation * Quaternion.Euler(0, turnAngle, 0));
+
+        // Velocity Fix
+        if (rb.velocity.magnitude > 0.1f)
         {
-            float adjustedHandling = handling * handlingFactor;
-            float turnAngle = turnInput * adjustedHandling * Time.fixedDeltaTime;
-            rb.MoveRotation(rb.rotation * Quaternion.Euler(0, turnAngle, 0));
+            rb.velocity = transform.forward * rb.velocity.magnitude;
         }
+
+
     }
 
-    // ---------------- CAMERA ----------------
     void HandleCamera()
     {
         if (playerCamera == null) return;
@@ -250,7 +270,6 @@ public class PlayerKartController : MonoBehaviour
         );
     }
 
-    // ---------------- STABILIZATION ----------------
     void StabilizeKart()
     {
         float halfHeight = col != null ? col.bounds.extents.y : 1f;
@@ -261,7 +280,6 @@ public class PlayerKartController : MonoBehaviour
             rb.AddForce(Vector3.down * groundForce, ForceMode.Acceleration);
     }
 
-    // ---------------- BOOST ----------------
     IEnumerator BoostCoroutine()
     {
         isBoosting = true;
@@ -271,14 +289,12 @@ public class PlayerKartController : MonoBehaviour
         if (boostParticles != null) boostParticles.Stop();
     }
 
-    // ---------------- COLLISIONS & SHAKE ----------------
     void OnCollisionEnter(Collision collision)
     {
-        // Tags that should NOT trigger shake
         if (collision.collider.CompareTag("Road") ||
             collision.collider.CompareTag("Terrain"))
         {
-            return; // ignore these
+            return;
         }
 
         float impactForce = collision.relativeVelocity.magnitude;
@@ -324,7 +340,6 @@ public class PlayerKartController : MonoBehaviour
         isShaking = false;
     }
 
-    // ---------------- GUI ----------------
     void OnGUI()
     {
         GUI.Label(new Rect(20, 20, 300, 30),
@@ -332,4 +347,5 @@ public class PlayerKartController : MonoBehaviour
             weightLabelStyle);
     }
 }
+
 
