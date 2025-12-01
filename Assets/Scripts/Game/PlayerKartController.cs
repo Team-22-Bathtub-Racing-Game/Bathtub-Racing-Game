@@ -37,8 +37,8 @@ public class PlayerKartController : MonoBehaviour
     public float collisionShakeDuration = 0.25f;
 
     [Header("Engine & Drift Audio")]
+    public AudioSource idleEngineAudio;
     public AudioSource engineAudio;
-    public AudioSource driftAudio;
     public float engineMinPitch = 0.8f;
     public float engineMaxPitch = 2.0f;
     public float engineBoostPitch = 0.3f;
@@ -138,12 +138,6 @@ public class PlayerKartController : MonoBehaviour
         if (Input.GetKey(KeyCode.LeftShift))
         {
             turnInput *= driftMultiplier;
-            if (driftAudio != null && !driftAudio.isPlaying)
-                driftAudio.Play();
-        }
-        else if (driftAudio != null && driftAudio.isPlaying)
-        {
-            driftAudio.Stop();
         }
 
         if (Input.GetKeyDown(KeyCode.Space) && !isBoosting)
@@ -152,15 +146,44 @@ public class PlayerKartController : MonoBehaviour
 
     void UpdateEngineSound()
     {
-        if (engineAudio == null) return;
+        if (engineAudio == null || idleEngineAudio == null) return;
 
-        float speedPercent = rb.velocity.magnitude / (speed * weightFactor);
+        float speedVal = rb.velocity.magnitude;
+
+        bool isMoving = speedVal > 0.5f;
+
+        // ---------------------------
+        //  ENGINE PITCH / VOLUME
+        // ---------------------------
+        float speedPercent = speedVal / (speed * weightFactor);
         engineAudio.pitch = Mathf.Lerp(engineMinPitch, engineMaxPitch, speedPercent);
-        engineAudio.volume = Mathf.Lerp(0.4f, 0.9f, speedPercent);
+        engineAudio.volume = Mathf.Lerp(0.2f, 0.5f, speedPercent);
 
         if (isBoosting)
             engineAudio.pitch += engineBoostPitch;
+
+        // ---------------------------
+        //  SEAMLESS SOUND SWITCHING
+        // ---------------------------
+
+        if (isMoving)
+        {
+            // Fade IN driving sound
+            engineAudio.volume = Mathf.MoveTowards(engineAudio.volume, 1f, Time.deltaTime * 3f);
+
+            // Fade OUT idle sound
+            idleEngineAudio.volume = Mathf.MoveTowards(idleEngineAudio.volume, 0f, Time.deltaTime * 3f);
+        }
+        else
+        {
+            // Fade IN idle sound
+            idleEngineAudio.volume = Mathf.MoveTowards(idleEngineAudio.volume, 0.8f, Time.deltaTime * 3f);
+
+            // Fade OUT driving sound
+            engineAudio.volume = Mathf.MoveTowards(engineAudio.volume, 0f, Time.deltaTime * 3f);
+        }
     }
+
 
     void UpdatePosition()
     {
@@ -208,7 +231,6 @@ public class PlayerKartController : MonoBehaviour
         }
         else
         {
-            // ---------------- CONSTANT SPEED SYSTEM (AIR) ----------------
             if (moveInput > 0.1f)
             {
                 Vector3 force = transform.forward * currentAcceleration;
