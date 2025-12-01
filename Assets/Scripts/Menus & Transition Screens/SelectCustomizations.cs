@@ -91,7 +91,7 @@ public class SelectCustomizations : MonoBehaviour
         {
             trimMaterial.material.color = newColor;
             _customKart.TrimColor = newColor;
-            if (extraDetail != null) extraDetail.GetComponent<MeshRenderer>().material.color = _customKart.TrimColor;
+            if (extraDetail != null && extraDetail.GetComponent<MeshRenderer>()) extraDetail.GetComponent<MeshRenderer>().material.color = _customKart.TrimColor;
         }
     }
 
