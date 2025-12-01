@@ -1,19 +1,18 @@
 using System.Collections;
 using TMPro;
 using UnityEngine;
-
+using UnityEngine.UI;
 public class LapCounter : MonoBehaviour
 {
     public int totalLaps = 3;
     public int currentLap = 1;
 
-    public TMP_Text lapText;
+    public TMP_Text lapText;       // Assign UI Text
     private bool canTriggerLap = true;
-    private bool raceStarted = false;
 
     void Start()
     {
-        UpdateLapDisplay(); // Show Lap 1 / totalLaps at start
+        UpdateLapDisplay();
     }
 
     private void OnTriggerEnter(Collider other)
@@ -26,27 +25,17 @@ public class LapCounter : MonoBehaviour
 
     void AdvanceLap()
     {
-        if (!raceStarted)
-        {
-            // First crossing just starts the race
-            raceStarted = true;
-            Debug.Log("Race officially started!");
-            StartCoroutine(LapCooldown());
-            return;
-        }
         currentLap++;
 
-        // Update display
-        UpdateLapDisplay();
-
-        // Check if race finished
         if (currentLap > totalLaps)
         {
-            lapText.text = "FINISHED!";
+            // Race finished
             Object.FindFirstObjectByType<RaceTimer>().StopRace();
+            lapText.text = "FINISHED!";
             return;
         }
 
+        UpdateLapDisplay();
         StartCoroutine(LapCooldown());
     }
 
