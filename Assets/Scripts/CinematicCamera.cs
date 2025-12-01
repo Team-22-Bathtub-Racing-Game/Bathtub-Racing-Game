@@ -8,7 +8,7 @@ public class CinematicCamera : MonoBehaviour
     
     void Update()
     {
-        if(Input.GetKey(KeyCode.Q)) //Move on positive X axis
+        /*if(Input.GetKey(KeyCode.Q)) //Move on positive X axis
             transform.position = new Vector3(transform.position.x + cameraSpeed, transform.position.y, transform.position.z);
         
         if(Input.GetKey(KeyCode.A)) //Move on negative X axis
@@ -30,6 +30,29 @@ public class CinematicCamera : MonoBehaviour
             transform.Rotate(new Vector3(0, 1, 0));
         
         if(Input.GetKey(KeyCode.F)) //Rotate right
+            transform.Rotate(new Vector3(0, -1, 0));*/
+        
+        if(Input.GetKey(KeyCode.A)) //Rotate left
             transform.Rotate(new Vector3(0, -1, 0));
+        
+        if(Input.GetKey(KeyCode.D)) //Rotate right
+            transform.Rotate(new Vector3(0, 1, 0));
+        
+        if(Input.GetKey(KeyCode.Space)) //Move on positive Y axis
+            transform.position = new Vector3(transform.position.x, transform.position.y  + cameraSpeed, transform.position.z);
+        
+        if(Input.GetKey(KeyCode.LeftShift)) //Move on negative Y axis
+            transform.position = new Vector3(transform.position.x, transform.position.y - cameraSpeed, transform.position.z);
+        
+        if(Input.GetKey(KeyCode.W)) //Move Forward
+            transform.position += transform.forward * cameraSpeed * 2;
+        
+        if(Input.GetKey(KeyCode.S)) //Move back
+            transform.position -= transform.forward * cameraSpeed * 2;
+
+        if (Input.GetKey(KeyCode.LeftControl))
+            cameraSpeed = 0.3f;
+        else
+            cameraSpeed = 0.05f;
     }
 }

@@ -62,6 +62,8 @@ public class SelectCustomizations : MonoBehaviour
         if (extraDetail != null) Destroy(extraDetail.gameObject);
         int extraDetailType = extraDetailInput.value;
         extraDetail = Instantiate(extraDetailOptions[extraDetailType], kart.transform);
+        if(extraDetail.GetComponent<MeshRenderer>())
+            extraDetail.GetComponent<MeshRenderer>().material.color = _customKart.TrimColor;
         _customKart.ExtraDetail = (ExtraDetailType)extraDetailType;
     }
 
@@ -89,6 +91,7 @@ public class SelectCustomizations : MonoBehaviour
         {
             trimMaterial.material.color = newColor;
             _customKart.TrimColor = newColor;
+            if (extraDetail != null && extraDetail.GetComponent<MeshRenderer>()) extraDetail.GetComponent<MeshRenderer>().material.color = _customKart.TrimColor;
         }
     }
 
@@ -133,6 +136,8 @@ public class SelectCustomizations : MonoBehaviour
         // Colors
         bodyMaterial.material.color = kartData.MainColor;
         trimMaterial.material.color = kartData.TrimColor;
+        if(extraDetail.GetComponent<MeshRenderer>())
+            extraDetail.GetComponent<MeshRenderer>().material.color = kartData.TrimColor;
         decalMaterial.material.color = kartData.DecalColor;
 
         // Update dropdowns and input fields
