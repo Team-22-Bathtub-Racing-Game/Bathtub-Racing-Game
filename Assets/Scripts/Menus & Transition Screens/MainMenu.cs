@@ -5,11 +5,6 @@ using UnityEngine.SceneManagement;
 
 public class MainMenu : MonoBehaviour
 {
-    public void PlayGame()
-    {
-        SceneManager.LoadScene("Racetrack");
-    }
-
     public void SelectTrack()
     {
         SceneManager.LoadScene("TrackSelection");

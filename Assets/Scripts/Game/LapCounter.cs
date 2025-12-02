@@ -13,8 +13,14 @@ public class LapCounter : MonoBehaviour
 
     void Start()
     {
+        totalLaps = PlayerPrefs.GetInt("SelectedLapCount", 3);
+
+        currentLap = 1;
+        raceStarted = false;
+
         UpdateLapDisplay();
     }
+
 
     private void OnTriggerEnter(Collider other)
     {

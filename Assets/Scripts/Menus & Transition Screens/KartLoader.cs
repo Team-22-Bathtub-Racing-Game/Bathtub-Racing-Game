@@ -32,7 +32,6 @@ public class KartLoader : MonoBehaviour
             if (k.KartName == selectedKartName)
                 target = k;
 
-        // Fallback if not found
         if (target == null)
         {
             Debug.LogWarning("Saved kart not found — loading default kart.");
