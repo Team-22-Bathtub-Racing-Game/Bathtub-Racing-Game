@@ -6,7 +6,7 @@ public static class KartSaveManager
 {
     private static string SavePath => Path.Combine(Application.persistentDataPath, "customKarts.json");
 
-    // Save a kart
+    // Save kart
     public static void SaveKart(CustomKart kart)
     {
         string json = JsonUtility.ToJson(new CustomKartSerializable(kart), true);

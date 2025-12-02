@@ -14,43 +14,46 @@ public class KartLoader : MonoBehaviour
     {
         selectedKartName = PlayerPrefs.GetString("SelectedKartName", "");
 
+        GameObject kartToSpawn;
+
+        // If no kart name stored, spawn default
         if (string.IsNullOrEmpty(selectedKartName))
         {
             Debug.LogWarning("No kart selected — loading default kart.");
-            Instantiate(kartBasePrefab);
+            kartToSpawn = Instantiate(kartBasePrefab);
             return;
         }
 
+        // Load all karts
         CustomKart[] saved = KartSaveManager.LoadKarts();
-
         CustomKart target = null;
-        foreach (var k in saved)
-        {
-            if (k.KartName == selectedKartName)
-            {
-                target = k;
-                break;
-            }
-        }
 
+        foreach (var k in saved)
+            if (k.KartName == selectedKartName)
+                target = k;
+
+        // Fallback if not found
         if (target == null)
         {
-            Debug.LogWarning("Saved kart not found — loading default.");
-            Instantiate(kartBasePrefab);
+            Debug.LogWarning("Saved kart not found — loading default kart.");
+            kartToSpawn = Instantiate(kartBasePrefab);
             return;
         }
 
+        // Spawn the customized kart
         GameObject kart = Instantiate(kartBasePrefab);
 
-        // APPLY COLORS TO CHILDREN OF THIS NEW INSTANCE
+        // Apply colors based on name of parts
         var renderers = kart.GetComponentsInChildren<MeshRenderer>();
 
         foreach (MeshRenderer r in renderers)
         {
             if (r.gameObject.name.Contains("Body"))
                 r.material.color = target.MainColor;
-            if (r.gameObject.name.Contains("Trim"))
+
+            if (r.gameObject.name.Contains("TubCap"))
                 r.material.color = target.TrimColor;
+
             if (r.gameObject.name.Contains("Decal"))
                 r.material.color = target.DecalColor;
         }
@@ -58,4 +61,5 @@ public class KartLoader : MonoBehaviour
         Debug.Log("Loaded kart: " + target.KartName);
     }
 }
+
 

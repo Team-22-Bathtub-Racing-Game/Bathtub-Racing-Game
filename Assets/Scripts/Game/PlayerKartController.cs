@@ -361,13 +361,6 @@ public class PlayerKartController : MonoBehaviour
         playerCamera.localPosition = originalPos;
         isShaking = false;
     }
-
-    void OnGUI()
-    {
-        GUI.Label(new Rect(20, 20, 300, 30),
-            $"Weight Class: {weightClass}",
-            weightLabelStyle);
-    }
 }
 
 

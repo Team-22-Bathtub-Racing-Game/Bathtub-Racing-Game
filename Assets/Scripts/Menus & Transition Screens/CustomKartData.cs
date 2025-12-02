@@ -1,6 +1,5 @@
 using UnityEngine;
 
-// Serializable kart class
 [System.Serializable]
 public class CustomKart
 {
