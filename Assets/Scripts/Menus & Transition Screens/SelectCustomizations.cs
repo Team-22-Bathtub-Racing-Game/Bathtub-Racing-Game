@@ -74,9 +74,8 @@ public class SelectCustomizations : MonoBehaviour
             if (decal.transform.GetChild(i).GetComponent<MeshRenderer>())
             {
                 decal.transform.GetChild(i).GetComponent<MeshRenderer>().material = decalMaterials[decalType];
-                decal.transform.GetChild(i).GetComponent<MeshRenderer>().material.color = _customKart.DecalColor;
+                decal.transform.GetChild(i).GetComponent<MeshRenderer>().material.color = _customKart.TrimColor;
             }
-        
         _customKart.Decal = (DecalType)decalType;
     }
 
