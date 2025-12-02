@@ -114,11 +114,14 @@ public class SelectCustomizations : MonoBehaviour
     public void ConfirmChanges()
     {
         KartSaveManager.SaveKart(_customKart);
-        PlayerPrefs.SetString("SelectedKartName", _customKart.KartName); // Save the chosen kart
+
+        // Tell the race scene which kart to load
+        PlayerPrefs.SetString("SelectedKartName", _customKart.KartName);
         PlayerPrefs.Save();
 
         Debug.Log("Kart saved and selected: " + _customKart.KartName);
     }
+
 
     public void LoadKart(CustomKart kartData)
     {

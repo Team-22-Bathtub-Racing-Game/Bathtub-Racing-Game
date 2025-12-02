@@ -20,7 +20,7 @@ public class CustomKart
 // Enums for customization
 public enum WheelType
 {
-    Large = 0, Small = 1, Combo = 2
+    Small = 0, Large = 1, Combo = 2
 }
 
 public enum RollCageType
