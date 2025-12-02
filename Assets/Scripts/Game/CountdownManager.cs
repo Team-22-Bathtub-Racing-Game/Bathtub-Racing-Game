@@ -7,7 +7,7 @@ public class CountdownManager : MonoBehaviour
     public TMP_Text countdownText;
     public RaceTimer raceTimer;
 
-    private PlayerKartController playerKart;  // we keep this, but we fill it automatically
+    private PlayerKartController playerKart;
 
     IEnumerator Start()
     {

@@ -14,11 +14,8 @@ public class Billboard : MonoBehaviour
             else
                 return;
         }
-
-        // FACE the camera
         transform.LookAt(cam);
 
-        // FIX: Many billboards need a 180° rotation to face correctly
         transform.Rotate(0, 180f, 0);
     }
 }

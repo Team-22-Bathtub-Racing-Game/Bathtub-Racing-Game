@@ -13,7 +13,7 @@ public class LapCounter : MonoBehaviour
 
     void Start()
     {
-        UpdateLapDisplay(); // Show Lap 1 / totalLaps at start
+        UpdateLapDisplay();
     }
 
     private void OnTriggerEnter(Collider other)
@@ -64,6 +64,3 @@ public class LapCounter : MonoBehaviour
         lapText.text = "Lap " + currentLap + " / " + totalLaps;
     }
 }
-
-
-

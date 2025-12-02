@@ -157,7 +157,6 @@ public class SelectCustomizations : MonoBehaviour
     // Initial defaults
     private void UpdateLapDisplayDefaults()
     {
-        // Apply default parts and colors to the scene
         SetWheels();
         SetRollCage();
         SetExtraDetail();

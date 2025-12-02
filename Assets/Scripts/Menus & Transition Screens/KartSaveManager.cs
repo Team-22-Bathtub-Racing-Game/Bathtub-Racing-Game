@@ -11,7 +11,6 @@ public static class KartSaveManager
     {
         string json = JsonUtility.ToJson(new CustomKartSerializable(kart), true);
 
-        // Check if file exists, load existing array
         CustomKartSerializableList kartList;
         if (File.Exists(SavePath))
         {
@@ -45,7 +44,6 @@ public static class KartSaveManager
     }
 }
 
-// Serializable wrapper for Color and enums
 [System.Serializable]
 public class CustomKartSerializable
 {
