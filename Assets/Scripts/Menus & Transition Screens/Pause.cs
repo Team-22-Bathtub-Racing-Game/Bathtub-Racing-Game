@@ -12,8 +12,6 @@ public class Pause : MonoBehaviour
     private void Start()
     {
         _isPaused = false;
-        Cursor.visible = false;
-        Cursor.lockState = CursorLockMode.Locked;
     }
 
     void Update()
@@ -30,15 +28,11 @@ public class Pause : MonoBehaviour
         {
             Time.timeScale = 0;
             PauseMenu.SetActive(true);
-            Cursor.visible = true;
-            Cursor.lockState = CursorLockMode.None;
         }
         else
         {
             Time.timeScale = 1;
             PauseMenu.SetActive(false);
-            Cursor.visible = false;
-            Cursor.lockState = CursorLockMode.Locked;
         }
     }
 }
