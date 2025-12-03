@@ -1236,7 +1236,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   countdownText: {fileID: 5396762639524240428}
   raceTimer: {fileID: 3272900598848478820}
-  playerKart: {fileID: 0}
+  playerKart: {fileID: 86434515137393450, guid: 73ffa1b9be9991847b175b2229a0abd6, type: 3}
 --- !u!1 &4207399990725404382
 GameObject:
   m_ObjectHideFlags: 0

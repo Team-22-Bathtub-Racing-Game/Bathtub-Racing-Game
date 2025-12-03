@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using TMPro;
 
 [RequireComponent(typeof(Rigidbody))]
 [RequireComponent(typeof(Collider))]
@@ -63,11 +64,9 @@ public class PlayerKartController : MonoBehaviour
     private bool isBoosting = false;
     private bool isShaking = false;
 
-    // NEW: Keeps the speed constant when W is released
+
     private float retainedSpeed = 0f;
 
-    // GUI
-    private GUIStyle weightLabelStyle;
 
     void Awake()
     {
@@ -102,13 +101,6 @@ public class PlayerKartController : MonoBehaviour
                 handlingFactor = 1.3f;
                 break;
         }
-
-        weightLabelStyle = new GUIStyle
-        {
-            fontSize = 22,
-            fontStyle = FontStyle.Bold,
-            normal = new GUIStyleState { textColor = Color.white }
-        };
 
         if (playerCamera != null)
         {
@@ -152,9 +144,8 @@ public class PlayerKartController : MonoBehaviour
 
         bool isMoving = speedVal > 0.5f;
 
-        // ---------------------------
         //  ENGINE PITCH / VOLUME
-        // ---------------------------
+
         float speedPercent = speedVal / (speed * weightFactor);
         engineAudio.pitch = Mathf.Lerp(engineMinPitch, engineMaxPitch, speedPercent);
         engineAudio.volume = Mathf.Lerp(0.2f, 0.5f, speedPercent);
@@ -162,9 +153,7 @@ public class PlayerKartController : MonoBehaviour
         if (isBoosting)
             engineAudio.pitch += engineBoostPitch;
 
-        // ---------------------------
         //  SEAMLESS SOUND SWITCHING
-        // ---------------------------
 
         if (isMoving)
         {
@@ -360,13 +349,6 @@ public class PlayerKartController : MonoBehaviour
 
         playerCamera.localPosition = originalPos;
         isShaking = false;
-    }
-
-    void OnGUI()
-    {
-        GUI.Label(new Rect(20, 20, 300, 30),
-            $"Weight Class: {weightClass}",
-            weightLabelStyle);
     }
 }
 

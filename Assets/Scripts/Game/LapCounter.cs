@@ -9,12 +9,18 @@ public class LapCounter : MonoBehaviour
 
     public TMP_Text lapText;
     private bool canTriggerLap = true;
-    private bool raceStarted = false; // Flag to track if race has begun
+    private bool raceStarted = false;
 
     void Start()
     {
-        UpdateLapDisplay(); // Show Lap 1 / totalLaps at start
+        totalLaps = PlayerPrefs.GetInt("SelectedLapCount", 3);
+
+        currentLap = 1;
+        raceStarted = false;
+
+        UpdateLapDisplay();
     }
+
 
     private void OnTriggerEnter(Collider other)
     {
@@ -64,6 +70,3 @@ public class LapCounter : MonoBehaviour
         lapText.text = "Lap " + currentLap + " / " + totalLaps;
     }
 }
-
-
-

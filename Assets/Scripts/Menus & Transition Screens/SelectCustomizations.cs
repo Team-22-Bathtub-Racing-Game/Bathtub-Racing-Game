@@ -24,7 +24,7 @@ public class SelectCustomizations : MonoBehaviour
     // Kart materials
     public MeshRenderer bodyMaterial;
     public MeshRenderer trimMaterial;
-    public Material[] decalMaterials;
+    public MeshRenderer decalMaterial;
 
     // UI input fields
     public TMP_Dropdown rollCageInput;
@@ -69,13 +69,9 @@ public class SelectCustomizations : MonoBehaviour
 
     public void SetDecal()
     {
+        if (decal != null) Destroy(decal.gameObject);
         int decalType = decalInput.value;
-        for(int i = 0; i < decal.transform.childCount; i++)
-            if (decal.transform.GetChild(i).GetComponent<MeshRenderer>())
-            {
-                decal.transform.GetChild(i).GetComponent<MeshRenderer>().material = decalMaterials[decalType];
-                decal.transform.GetChild(i).GetComponent<MeshRenderer>().material.color = _customKart.TrimColor;
-            }
+        decal = Instantiate(decalOptions[decalType], kart.transform);
         _customKart.Decal = (DecalType)decalType;
     }
 
@@ -103,9 +99,7 @@ public class SelectCustomizations : MonoBehaviour
     {
         if (ColorUtility.TryParseHtmlString("#" + color, out Color newColor))
         {
-            for(int i = 0; i < decal.transform.childCount; i++)
-                if(decal.transform.GetChild(i).GetComponent<MeshRenderer>())
-                    decal.transform.GetChild(i).GetComponent<MeshRenderer>().material.color = newColor;
+            decalMaterial.material.color = newColor;
             _customKart.DecalColor = newColor;
         }
     }
@@ -120,8 +114,14 @@ public class SelectCustomizations : MonoBehaviour
     public void ConfirmChanges()
     {
         KartSaveManager.SaveKart(_customKart);
-        Debug.Log($"Kart saved: {_customKart.KartName} by {_customKart.DriverName}");
+
+        // Tell the race scene which kart to load
+        PlayerPrefs.SetString("SelectedKartName", _customKart.KartName);
+        PlayerPrefs.Save();
+
+        Debug.Log("Kart saved and selected: " + _customKart.KartName);
     }
+
 
     public void LoadKart(CustomKart kartData)
     {
@@ -141,7 +141,7 @@ public class SelectCustomizations : MonoBehaviour
         trimMaterial.material.color = kartData.TrimColor;
         if(extraDetail.GetComponent<MeshRenderer>())
             extraDetail.GetComponent<MeshRenderer>().material.color = kartData.TrimColor;
-        //decalMaterial.material.color = kartData.DecalColor;
+        decalMaterial.material.color = kartData.DecalColor;
 
         // Update dropdowns and input fields
         wheelInput.value = (int)kartData.Wheel;
@@ -157,13 +157,12 @@ public class SelectCustomizations : MonoBehaviour
     // Initial defaults
     private void UpdateLapDisplayDefaults()
     {
-        // Apply default parts and colors to the scene
         SetWheels();
         SetRollCage();
         SetExtraDetail();
         SetDecal();
         SelectMainColor("FFFFFF");
         SelectTrimColor("000000");
-        SelectDecalColor("FFFFFF");
+        SelectDecalColor("FF0000");
     }
 }
