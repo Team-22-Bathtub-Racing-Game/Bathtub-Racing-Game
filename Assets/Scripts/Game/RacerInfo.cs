@@ -6,41 +6,34 @@ public class RacerInfo : MonoBehaviour
     public string racerName = "Racer";
     public bool isPlayer = false;
 
-    [Header("Race Progress (read-only at runtime)")]
-    public int currentLap = 0;        // 0-based internally
+    [Header("Race Progress")]
+    public int currentLap = 0;         // 0-based
     public int totalLaps = 3;
-    public int currentWaypoint = 0;
+    public int currentWaypoint = 0;    // waypoint index
     public float distanceToNext = 0f;
     public bool hasFinished = false;
 
-    // Internal refs
     public WaypointContainer waypointContainer { get; private set; }
-    private OpponentKartAI ai;
-    private Transform tr;
+
+    OpponentKartAI ai;
+    Transform tr;
 
     void Awake()
     {
         tr = transform;
         ai = GetComponent<OpponentKartAI>();
 
-        // Get total laps from PlayerPrefs
+            waypointContainer = FindFirstObjectByType<WaypointContainer>();  
+
+        // Get total laps from Track Selection
         totalLaps = PlayerPrefs.GetInt("SelectedLapCount", totalLaps);
 
-        // For AI: reuse its existing waypointContainer
-        if (ai != null && ai.waypointContainer != null)
-        {
+        // Use AI's waypointContainer if available
+        if (ai != null)
             waypointContainer = ai.waypointContainer;
-        }
-        else
-        {
-            // For player (or fallback): auto-find the global WaypointContainer
-            waypointContainer = FindObjectOfType<WaypointContainer>();
 
-            if (waypointContainer == null)
-            {
-                Debug.LogWarning($"RacerInfo on {name}: No WaypointContainer found in scene.");
-            }
-        }
+        if (waypointContainer == null)
+            Debug.LogError("RacerInfo: No WaypointContainer found!");
     }
 
     void Update()
@@ -52,7 +45,6 @@ public class RacerInfo : MonoBehaviour
 
         var list = waypointContainer.waypoints;
 
-        // --- AI: use OpponentKartAI's currentWaypoint ---
         if (ai != null)
         {
             currentWaypoint = Mathf.Clamp(ai.currentWaypoint, 0, list.Count - 1);
@@ -60,23 +52,21 @@ public class RacerInfo : MonoBehaviour
         }
         else
         {
-            // --- Player: approximate by nearest waypoint ---
             int bestIndex = 0;
-            float bestSqr = float.MaxValue;
-            Vector3 pos = tr.position;
+            float best = float.MaxValue;
 
             for (int i = 0; i < list.Count; i++)
             {
-                float d = (list[i].position - pos).sqrMagnitude;
-                if (d < bestSqr)
+                float d = (tr.position - list[i].position).sqrMagnitude;
+                if (d < best)
                 {
-                    bestSqr = d;
+                    best = d;
                     bestIndex = i;
                 }
             }
 
             currentWaypoint = bestIndex;
-            distanceToNext = Mathf.Sqrt(bestSqr);
+            distanceToNext = Mathf.Sqrt(best);
         }
     }
 }

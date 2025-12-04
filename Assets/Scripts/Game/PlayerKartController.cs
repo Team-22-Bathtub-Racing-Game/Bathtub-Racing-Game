@@ -67,7 +67,6 @@ public class PlayerKartController : MonoBehaviour
 
     private float retainedSpeed = 0f;
 
-
     void Awake()
     {
         rb = GetComponent<Rigidbody>();

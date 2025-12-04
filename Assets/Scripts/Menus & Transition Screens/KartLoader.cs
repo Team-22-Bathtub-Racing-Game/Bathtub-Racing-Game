@@ -7,8 +7,10 @@ public class KartLoader : MonoBehaviour
 
     void Start()
     {
+        FindFirstObjectByType<RacePositionManager>().RefreshRacers();
         LoadKart();
     }
+    
 
     void LoadKart()
     {
@@ -41,6 +43,9 @@ public class KartLoader : MonoBehaviour
 
         // Spawn the customized kart
         GameObject kart = Instantiate(kartBasePrefab);
+        var rpm = FindFirstObjectByType<RacePositionManager>();
+        if (rpm != null)
+            rpm.RefreshRacers();
 
         // Apply colors based on name of parts
         var renderers = kart.GetComponentsInChildren<MeshRenderer>();

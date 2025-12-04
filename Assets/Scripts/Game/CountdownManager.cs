@@ -44,7 +44,7 @@ public class CountdownManager : MonoBehaviour
             playerKart.canDrive = true;
         }
         
-        OpponentKartAI[] ais = FindObjectsOfType<OpponentKartAI>();
+        OpponentKartAI[] ais = Object.FindObjectsOfType<OpponentKartAI>();
         foreach (var ai in ais)
             ai.canDrive = true;
 
