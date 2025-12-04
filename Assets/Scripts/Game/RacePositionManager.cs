@@ -49,6 +49,6 @@ public class RacePositionManager : MonoBehaviour
 
         int position = racers.IndexOf(player) + 1;
 
-        positionText.text = position + "/" + racers.Count;
+        positionText.text = "Place: " + position + "/" + racers.Count;
     }
 }
