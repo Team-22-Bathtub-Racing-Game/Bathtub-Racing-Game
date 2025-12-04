@@ -6,6 +6,7 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+<<<<<<< Updated upstream
     path: Assets/Scenes/Main Menu.unity
     guid: 1b0f14072baf4484fb9bdece23419553
   - enabled: 1
@@ -25,4 +26,12 @@ EditorBuildSettings:
     guid: 2714a4f63c72f7144b0bba7bd12c6a5f
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+=======
+    path: Assets/Scenes/KartCustomization.unity
+    guid: bfea6053c3dc868408f4ef44b52f9c00
+  - enabled: 1
+    path: Assets/Scenes/Racetrack.unity
+    guid: 99c9720ab356a0642a771bea13969a05
+  m_configObjects: {}
+>>>>>>> Stashed changes
   m_UseUCBPForAssetBundles: 0
