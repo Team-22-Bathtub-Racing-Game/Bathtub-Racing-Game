@@ -311,6 +311,8 @@ GameObject:
   - component: {fileID: 9286265359415277}
   - component: {fileID: 8692217085969070497}
   - component: {fileID: 86434515137393450}
+  - component: {fileID: 9033095591941567120}
+  - component: {fileID: 6654165857249740380}
   m_Layer: 0
   m_Name: CustomKartBase
   m_TagString: Player
@@ -433,6 +435,37 @@ MonoBehaviour:
   collisionSlowdownFactor: 0.6
   boostParticles: {fileID: 0}
   groundForce: 50
+--- !u!114 &9033095591941567120
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1825585870739441330}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b858df9490a557b429219c6d10adc23a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  racerName: Player
+  isPlayer: 1
+  currentLap: 0
+  totalLaps: 3
+  currentWaypoint: 0
+  distanceToNext: 0
+  hasFinished: 0
+--- !u!114 &6654165857249740380
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1825585870739441330}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 01da5ea5febf9064499e272618587d5c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &2187071869602070823
 GameObject:
   m_ObjectHideFlags: 0

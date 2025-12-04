@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class LapCounter : MonoBehaviour
 {
+    private RacerInfo playerRacerInfo;
+
     public int totalLaps = 3;
     public int currentLap = 1;   // 1-based for UI
 
@@ -37,6 +39,11 @@ public class LapCounter : MonoBehaviour
         }
 
         UpdateLapDisplay();
+
+        playerRacerInfo = FindFirstObjectByType<RacerInfo>();
+        playerRacerInfo.currentLap = 1;
+        playerRacerInfo.totalLaps = totalLaps;
+
     }
 
     private void OnTriggerEnter(Collider other)
@@ -53,7 +60,6 @@ public class LapCounter : MonoBehaviour
             if (aiRacer != null && !aiRacer.hasFinished)
             {
                 aiRacer.currentLap++;
-
                 if (aiRacer.currentLap >= aiRacer.totalLaps)
                     aiRacer.hasFinished = true;
             }
@@ -65,21 +71,23 @@ public class LapCounter : MonoBehaviour
         if (!raceStarted)
         {
             raceStarted = true;
-            Debug.Log("Race officially started!");
+            playerRacerInfo.currentLap = currentLap;
+
             StartCoroutine(LapCooldown());
             return;
         }
-        currentLap++;
 
+        currentLap++;
+        playerRacerInfo.currentLap = currentLap;
+
+        // Update player RacerInfo
         if (playerRacer != null)
         {
-            playerRacer.currentLap = currentLap - 1;
-
+            playerRacer.currentLap = currentLap - 1; // internal 0-based
             if (currentLap > totalLaps)
                 playerRacer.hasFinished = true;
         }
 
-        // Check if race finished
         if (currentLap > totalLaps)
         {
             lapText.text = "FINISHED!";

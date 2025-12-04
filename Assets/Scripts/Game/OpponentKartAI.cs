@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.TextCore;
 
 [RequireComponent(typeof(Rigidbody))]
 public class OpponentKartAI : MonoBehaviour
@@ -25,7 +26,7 @@ public class OpponentKartAI : MonoBehaviour
     [Header("Race Control")]
     public bool canDrive = false;
 
-
+    private RacerInfo racerInfo;
 
     void Start()
     {
@@ -37,6 +38,18 @@ public class OpponentKartAI : MonoBehaviour
 
         waypoints = waypointContainer.waypoints;
         currentWaypoint = 0;
+
+        currentWaypoint++;
+        if (currentWaypoint >= waypoints.Count)
+        {
+            currentWaypoint = 0;
+
+            if (!racerInfo.hasFinished)
+                racerInfo.currentLap++;
+        }
+
+        racerInfo = GetComponent<RacerInfo>();
+        racerInfo.totalLaps = PlayerPrefs.GetInt("SelectedLapCount", 3);
     }
 
     void FixedUpdate()
@@ -55,6 +68,15 @@ public class OpponentKartAI : MonoBehaviour
         {
             HandleSlopeMovement();
         }
+
+        // Sync AI progress to RacerInfo
+        if (racerInfo != null)
+        {
+            racerInfo.currentWaypoint = currentWaypoint;
+            racerInfo.distanceToNext =
+                Vector3.Distance(transform.position, waypoints[currentWaypoint].position);
+        }
+
     }
 
     void HandleWaypointMovement()
