@@ -152,6 +152,7 @@ MonoBehaviour:
   totalLaps: 3
   currentLap: 1
   lapText: {fileID: 140771694178682777}
+  playerRacer: {fileID: 0}
 --- !u!1 &635993081126800253
 GameObject:
   m_ObjectHideFlags: 0
@@ -1236,7 +1237,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   countdownText: {fileID: 5396762639524240428}
   raceTimer: {fileID: 3272900598848478820}
-  playerKart: {fileID: 0}
 --- !u!1 &4207399990725404382
 GameObject:
   m_ObjectHideFlags: 0
@@ -1345,11 +1345,11 @@ RectTransform:
   - {fileID: 7547606791427832344}
   m_Father: {fileID: 7815482658772867213}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0}
-  m_AnchorMax: {x: 0.5, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchorMin: {x: 1, y: 1}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: -0.000061035156, y: 0}
   m_SizeDelta: {x: 160, y: 80}
-  m_Pivot: {x: 0.5, y: 0}
+  m_Pivot: {x: 1, y: 1}
 --- !u!1 &4392781072091242845
 GameObject:
   m_ObjectHideFlags: 0
