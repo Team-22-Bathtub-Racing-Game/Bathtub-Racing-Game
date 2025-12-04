@@ -5,12 +5,23 @@ using System.Collections;
 public class CountdownManager : MonoBehaviour
 {
     public TMP_Text countdownText;
-    public RaceTimer raceTimer;     // assign race timer
-    public PlayerKartController playerKart;  // assign player's kart controller
+    public RaceTimer raceTimer;
 
-    void Start()
+    private PlayerKartController playerKart;
+
+    IEnumerator Start()
     {
-        playerKart.canDrive = false;     // freeze kart
+        // Wait 1 frame so KartLoader can spawn the kart first
+        yield return null;
+
+        // Automatically find the spawned kart
+        playerKart = Object.FindFirstObjectByType<PlayerKartController>();
+
+        if (playerKart == null)
+        {
+            Debug.LogWarning("CountdownManager: No PlayerKartController found in scene!");
+        }
+
         StartCoroutine(CountdownSequence());
     }
 
@@ -27,9 +38,17 @@ public class CountdownManager : MonoBehaviour
 
         countdownText.text = "GO!";
         raceTimer.StartRace();
-        playerKart.canDrive = true;      // UNFREEZE kart!
-        yield return new WaitForSeconds(1f);
 
-        countdownText.text = "";         // hide countdown
+        if (playerKart != null)
+        {
+            playerKart.canDrive = true;
+        }
+        
+        OpponentKartAI[] ais = FindObjectsOfType<OpponentKartAI>();
+        foreach (var ai in ais)
+            ai.canDrive = true;
+
+        yield return new WaitForSeconds(1f);
+        countdownText.text = "";
     }
 }

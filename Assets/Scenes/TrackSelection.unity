@@ -222,18 +222,18 @@ PrefabInstance:
     - target: {fileID: 5036403636432135328, guid: 7821cad44794cb749b0d1b9ad15401d8, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 46018193}
+      objectReference: {fileID: 46018197}
     - target: {fileID: 5036403636432135328, guid: 7821cad44794cb749b0d1b9ad15401d8, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 5036403636432135328, guid: 7821cad44794cb749b0d1b9ad15401d8, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: PlayGame
+      value: ConfirmAndStartRace
       objectReference: {fileID: 0}
     - target: {fileID: 5036403636432135328, guid: 7821cad44794cb749b0d1b9ad15401d8, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
-      value: MainMenu, Assembly-CSharp
+      value: TrackSelectionManager, Assembly-CSharp
       objectReference: {fileID: 0}
     - target: {fileID: 5036403636432135328, guid: 7821cad44794cb749b0d1b9ad15401d8, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
@@ -249,7 +249,7 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 4675191284505507426, guid: 7821cad44794cb749b0d1b9ad15401d8, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 46018193}
+      addedObject: {fileID: 46018197}
   m_SourcePrefab: {fileID: 100100000, guid: 7821cad44794cb749b0d1b9ad15401d8, type: 3}
 --- !u!224 &46018191 stripped
 RectTransform:
@@ -261,7 +261,7 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 4675191284505507426, guid: 7821cad44794cb749b0d1b9ad15401d8, type: 3}
   m_PrefabInstance: {fileID: 46018190}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &46018193
+--- !u!114 &46018197
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -270,9 +270,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 46018192}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f96f4f225ce9e4a4f97c9725b216ab34, type: 3}
+  m_Script: {fileID: 11500000, guid: 9f49029bdd017334e95a6799d090639b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  lapsInput: {fileID: 366807381}
+  opponentsInput: {fileID: 2053942489}
 --- !u!1 &76240352
 GameObject:
   m_ObjectHideFlags: 0

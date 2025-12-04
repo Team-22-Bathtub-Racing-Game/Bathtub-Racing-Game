@@ -47,7 +47,7 @@ AudioSource:
   m_PlayOnAwake: 1
   m_Volume: 1
   m_Pitch: 1
-  Loop: 0
+  Loop: 1
   Mute: 0
   Spatialize: 0
   SpatializePostEffects: 0
@@ -326,8 +326,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1825585870739441330}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.047848057, y: 0.033626586, z: 0.011266912, w: -0.9982249}
-  m_LocalPosition: {x: 381.16016, y: 25.425133, z: 412.99}
+  m_LocalRotation: {x: -0.047880106, y: 0.0596603, z: 0.010672691, w: -0.9970127}
+  m_LocalPosition: {x: 382.88, y: 25.46, z: 413.09}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -347,7 +347,7 @@ Transform:
   - {fileID: 8011790609079702064}
   - {fileID: 7439043501238481846}
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 5.438, y: 356.071, z: -1.48}
+  m_LocalEulerAnglesHint: {x: 5.405, y: 353.078, z: -1.554}
 --- !u!54 &9286265359415277
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -408,7 +408,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c0865e0ac2684164aa3bf0b2aa1b9b18, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  acceleration: 30
+  acceleration: 25
   handling: 90
   speed: 20
   weightClass: 1
@@ -1561,7 +1561,7 @@ AudioSource:
   m_PlayOnAwake: 1
   m_Volume: 0.275
   m_Pitch: 1
-  Loop: 0
+  Loop: 1
   Mute: 0
   Spatialize: 0
   SpatializePostEffects: 0

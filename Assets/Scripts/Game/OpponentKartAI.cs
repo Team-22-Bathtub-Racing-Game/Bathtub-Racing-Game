@@ -22,6 +22,11 @@ public class OpponentKartAI : MonoBehaviour
 
     private float brakingZoneSpeed = -1f;
 
+    [Header("Race Control")]
+    public bool canDrive = false;
+
+
+
     void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -36,6 +41,12 @@ public class OpponentKartAI : MonoBehaviour
 
     void FixedUpdate()
     {
+        if (!canDrive)
+        {
+            rb.velocity = Vector3.zero;
+            return;
+        }
+
         if (waypoints != null && waypoints.Count > 0)
         {
             HandleWaypointMovement();
