@@ -11,20 +11,23 @@ public class RacePositionManager : MonoBehaviour
 
     void Start()
     {
-        // FIND ALL RACERS IN THE SCENE
-        racers = FindObjectsOfType<RacerInfo>().ToList();
-
-        if (racers.Count == 0)
-            Debug.LogError("NO RACERS FOUND! Add RacerInfo to all karts.");
+        RefreshRacers();
     }
+
     public void RefreshRacers()
     {
-        racers = FindObjectsOfType<RacerInfo>().ToList();
+        racers = FindObjectsOfType<RacerInfo>()
+            .Where(r => r != null)
+            .Distinct()
+            .ToList();
+
         Debug.Log("Racers refreshed! Count = " + racers.Count);
     }
 
     void Update()
     {
+        if (racers.Count == 0) return;
+
         SortRacers();
         UpdatePositionDisplay();
     }
@@ -43,12 +46,20 @@ public class RacePositionManager : MonoBehaviour
 
         if (player == null)
         {
-            Debug.LogError("PLAYER NOT FOUND IN RACER LIST!");
+            positionText.text = "ERR";
             return;
         }
 
         int position = racers.IndexOf(player) + 1;
-
         positionText.text = position + "/" + racers.Count;
     }
+
+    public int GetPlayerPosition()
+    {
+        SortRacers();
+        RacerInfo player = racers.First(r => r.isPlayer);
+        return racers.IndexOf(player) + 1;
+    }
 }
+
+

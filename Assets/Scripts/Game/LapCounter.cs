@@ -23,15 +23,6 @@ public class LapCounter : MonoBehaviour
         currentLap = 1;
         raceStarted = false;
 
-        if (playerRacer == null)
-        {
-            // Find the player’s RacerInfo automatically
-            RacerInfo[] infos = Object.FindObjectsOfType<RacerInfo>();
-            foreach (var r in infos)
-                if (r.isPlayer)
-                    playerRacer = r;
-        }
-
         if (playerRacer != null)
         {
             playerRacer.currentLap = 0;      // 0-based internal
@@ -92,6 +83,8 @@ public class LapCounter : MonoBehaviour
         {
             lapText.text = "FINISHED!";
             Object.FindFirstObjectByType<RaceTimer>().StopRace();
+            playerRacerInfo.hasFinished = true;
+
             return;
         }
 

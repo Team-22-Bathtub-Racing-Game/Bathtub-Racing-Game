@@ -7,26 +7,15 @@ public class KartLoader : MonoBehaviour
 
     void Start()
     {
-        FindFirstObjectByType<RacePositionManager>().RefreshRacers();
         LoadKart();
     }
-    
 
     void LoadKart()
     {
         selectedKartName = PlayerPrefs.GetString("SelectedKartName", "");
+        GameObject kart;
 
-        GameObject kartToSpawn;
-
-        // If no kart name stored, spawn default
-        if (string.IsNullOrEmpty(selectedKartName))
-        {
-            Debug.LogWarning("No kart selected — loading default kart.");
-            kartToSpawn = Instantiate(kartBasePrefab);
-            return;
-        }
-
-        // Load all karts
+        // Load saved karts
         CustomKart[] saved = KartSaveManager.LoadKarts();
         CustomKart target = null;
 
@@ -34,35 +23,40 @@ public class KartLoader : MonoBehaviour
             if (k.KartName == selectedKartName)
                 target = k;
 
-        if (target == null)
+        // Spawn kart (only ONCE)
+        kart = Instantiate(kartBasePrefab);
+
+        // Apply colors if saved exists
+        if (target != null)
         {
-            Debug.LogWarning("Saved kart not found — loading default kart.");
-            kartToSpawn = Instantiate(kartBasePrefab);
-            return;
+            var renderers = kart.GetComponentsInChildren<MeshRenderer>();
+
+            foreach (MeshRenderer r in renderers)
+            {
+                if (r.gameObject.name.Contains("Body"))
+                    r.material.color = target.MainColor;
+
+                if (r.gameObject.name.Contains("TubCap"))
+                    r.material.color = target.TrimColor;
+
+                if (r.gameObject.name.Contains("Decal"))
+                    r.material.color = target.DecalColor;
+            }
+
+            Debug.Log("Loaded kart: " + target.KartName);
+        }
+        else
+        {
+            Debug.LogWarning("No saved kart found — using default.");
         }
 
-        // Spawn the customized kart
-        GameObject kart = Instantiate(kartBasePrefab);
+        // ONLY NOW refresh racers
         var rpm = FindFirstObjectByType<RacePositionManager>();
         if (rpm != null)
-            rpm.RefreshRacers();
-
-        // Apply colors based on name of parts
-        var renderers = kart.GetComponentsInChildren<MeshRenderer>();
-
-        foreach (MeshRenderer r in renderers)
         {
-            if (r.gameObject.name.Contains("Body"))
-                r.material.color = target.MainColor;
-
-            if (r.gameObject.name.Contains("TubCap"))
-                r.material.color = target.TrimColor;
-
-            if (r.gameObject.name.Contains("Decal"))
-                r.material.color = target.DecalColor;
+            rpm.RefreshRacers();
+            Debug.Log("REFRESH after player kart spawn");
         }
-
-        Debug.Log("Loaded kart: " + target.KartName);
     }
 }
 
