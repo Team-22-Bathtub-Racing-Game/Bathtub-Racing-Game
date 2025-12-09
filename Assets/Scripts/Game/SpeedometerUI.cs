@@ -22,11 +22,20 @@ public class SpeedometerUI : MonoBehaviour
 
     void Update()
     {
-        if (playerRB == null || speedText == null)
-            return;
+        // If not found yet, keep searching
+        if (playerRB == null)
+        {
+            GameObject player = GameObject.FindGameObjectWithTag("Player");
 
-        float speedMPH = playerRB.velocity.magnitude * ToMPH;
+            if (player != null)
+                playerRB = player.GetComponent<Rigidbody>();
+        }
 
-        speedText.text = speedMPH.ToString("000");
+        // Once assigned, update normally
+        if (playerRB != null && speedText != null)
+        {
+            float speedMPH = playerRB.velocity.magnitude * ToMPH;
+            speedText.text = speedMPH.ToString("000");
+        }
     }
 }
