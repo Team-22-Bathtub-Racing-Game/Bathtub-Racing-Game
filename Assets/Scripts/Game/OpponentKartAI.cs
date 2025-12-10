@@ -4,7 +4,7 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody))]
 public class OpponentKartAI : MonoBehaviour
 {
-    [Header ("Waypoint initizer")]
+    [Header("Waypoint initizer")]
     public WaypointContainer waypointContainer;
     public List<Transform> waypoints;
     public int currentWaypoint;
@@ -18,9 +18,17 @@ public class OpponentKartAI : MonoBehaviour
     public float slopeFactor = 1f;
     public float groundForce = 50f;
 
+    [Header("AI Weight")]
+    public float AIWeight;
+
+    [Header("Kart Visuals")]
+    public MeshRenderer bathtubRenderer;
+
     private Rigidbody rb;
 
     private float brakingZoneSpeed = -1f;
+
+
 
     void Start()
     {
@@ -29,9 +37,22 @@ public class OpponentKartAI : MonoBehaviour
         rb.interpolation = RigidbodyInterpolation.Interpolate;
         rb.collisionDetectionMode = CollisionDetectionMode.Continuous;
 
-        
         waypoints = waypointContainer.waypoints;
         currentWaypoint = 0;
+
+        AIWeight = Random.Range(0.8f, 1.3f);
+        RandomizeBodyColor();
+    }
+
+    void RandomizeBodyColor()
+    {
+        if (bathtubRenderer != null)
+        {
+            Color randomColor = new Color(Random.Range(0.2f, 1f), Random.Range(0.2f, 1f), Random.Range(0.2f, 1f));
+            bathtubRenderer.material = new Material(bathtubRenderer.material);
+            bathtubRenderer.material.color = randomColor;
+        }
+       
     }
 
     void FixedUpdate()
@@ -80,7 +101,8 @@ public class OpponentKartAI : MonoBehaviour
         }
 
         //Acceleration
-        Vector3 force = desiredDireection * acceleration;
+        float currentAcceleration = acceleration * (1f / AIWeight);
+        Vector3 force = desiredDireection * currentAcceleration;
         rb.AddForce(force, ForceMode.Acceleration);
 
         // Speed limiting
@@ -131,7 +153,8 @@ public class OpponentKartAI : MonoBehaviour
                     adjustment = slopeFactor; // Downhill (speed up)
             }
 
-            Vector3 force = slopeForward * acceleration * adjustment;
+            float currentAcceleration = acceleration * (1f / AIWeight);
+            Vector3 force = slopeForward * currentAcceleration * adjustment;
             rb.AddForce(force, ForceMode.Acceleration);
 
             if (rb.velocity.magnitude > maxSpeed)
