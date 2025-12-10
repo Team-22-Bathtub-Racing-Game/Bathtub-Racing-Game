@@ -64,8 +64,11 @@ public class PlayerKartController : MonoBehaviour
     private bool isBoosting = false;
     private bool isShaking = false;
 
-
     private float retainedSpeed = 0f;
+    private float retainedSpeedDirection = 1f; // forward = +1, reverse = -1
+
+    private float reverseEngageSpeed = 0.5f; // must slow to this before reversing
+
 
     void Awake()
     {
@@ -127,9 +130,7 @@ public class PlayerKartController : MonoBehaviour
         turnInput = Input.GetAxis("Horizontal");
 
         if (Input.GetKey(KeyCode.LeftShift))
-        {
             turnInput *= driftMultiplier;
-        }
 
         if (Input.GetKeyDown(KeyCode.Space) && !isBoosting)
             StartCoroutine(BoostCoroutine());
@@ -140,10 +141,7 @@ public class PlayerKartController : MonoBehaviour
         if (engineAudio == null || idleEngineAudio == null) return;
 
         float speedVal = rb.velocity.magnitude;
-
         bool isMoving = speedVal > 0.5f;
-
-        //  ENGINE PITCH / VOLUME
 
         float speedPercent = speedVal / (speed * weightFactor);
         engineAudio.pitch = Mathf.Lerp(engineMinPitch, engineMaxPitch, speedPercent);
@@ -152,26 +150,17 @@ public class PlayerKartController : MonoBehaviour
         if (isBoosting)
             engineAudio.pitch += engineBoostPitch;
 
-        //  SEAMLESS SOUND SWITCHING
-
         if (isMoving)
         {
-            // Fade IN driving sound
             engineAudio.volume = Mathf.MoveTowards(engineAudio.volume, 1f, Time.deltaTime * 3f);
-
-            // Fade OUT idle sound
             idleEngineAudio.volume = Mathf.MoveTowards(idleEngineAudio.volume, 0f, Time.deltaTime * 3f);
         }
         else
         {
-            // Fade IN idle sound
             idleEngineAudio.volume = Mathf.MoveTowards(idleEngineAudio.volume, 0.8f, Time.deltaTime * 3f);
-
-            // Fade OUT driving sound
             engineAudio.volume = Mathf.MoveTowards(engineAudio.volume, 0f, Time.deltaTime * 3f);
         }
     }
-
 
     void UpdatePosition()
     {
@@ -185,8 +174,7 @@ public class PlayerKartController : MonoBehaviour
         if (isBoosting) currentAcceleration *= boostMultiplier;
 
         float halfHeight = col != null ? col.bounds.extents.y : 1f;
-        Vector3 rayStart = col != null ? col.bounds.center + Vector3.up * 0.1f
-                                       : transform.position + Vector3.up * 0.1f;
+        Vector3 rayStart = col != null ? col.bounds.center + Vector3.up * 0.1f : transform.position + Vector3.up * 0.1f;
         float rayLength = halfHeight + 0.5f;
 
         bool grounded = Physics.Raycast(rayStart, Vector3.down, out RaycastHit hit, rayLength);
@@ -198,47 +186,77 @@ public class PlayerKartController : MonoBehaviour
 
             Vector3 slopeForward = Vector3.ProjectOnPlane(transform.forward, hit.normal).normalized;
 
-            // ---------------- CONSTANT SPEED SYSTEM (GROUND) ----------------
+            // --------------------------
+            //     FORWARD MOVEMENT
+            // --------------------------
             if (moveInput > 0.1f)
             {
-                Vector3 force = slopeForward * currentAcceleration * slopeFactor;
-                rb.AddForce(force, ForceMode.Acceleration);
+                rb.AddForce(slopeForward * currentAcceleration * slopeFactor, ForceMode.Acceleration);
                 retainedSpeed = rb.velocity.magnitude;
+                retainedSpeedDirection = 1f;
             }
+            // --------------------------
+            //     BRAKING / REVERSE
+            // --------------------------
             else if (moveInput < -0.1f)
             {
-                Vector3 force = slopeForward * moveInput * currentAcceleration * slopeFactor;
-                rb.AddForce(force, ForceMode.Acceleration);
+                // If moving forward faster than reverse threshold → BRAKE
+                if (Vector3.Dot(rb.velocity, transform.forward) > reverseEngageSpeed)
+                {
+                    rb.velocity = Vector3.MoveTowards(rb.velocity, Vector3.zero, currentAcceleration * Time.fixedDeltaTime);
+                    retainedSpeed = rb.velocity.magnitude;
+                    return; // Stop here — do NOT reverse yet
+                }
+
+                // Now fully slowed → REVERSE
+                rb.AddForce(slopeForward * moveInput * currentAcceleration * slopeFactor, ForceMode.Acceleration);
                 retainedSpeed = rb.velocity.magnitude;
+                retainedSpeedDirection = -1f;
             }
             else
             {
+                // COASTING
                 if (rb.velocity.magnitude < retainedSpeed)
-                    rb.velocity = rb.velocity.normalized * retainedSpeed;
+                {
+                    Vector3 dir = (retainedSpeedDirection < 0) ? -transform.forward : transform.forward;
+                    rb.velocity = dir * retainedSpeed;
+                }
             }
         }
         else
         {
+            // ------------------ MID-AIR FORWARD ------------------
             if (moveInput > 0.1f)
             {
-                Vector3 force = transform.forward * currentAcceleration;
-                rb.AddForce(force, ForceMode.Acceleration);
+                rb.AddForce(transform.forward * currentAcceleration, ForceMode.Acceleration);
                 retainedSpeed = rb.velocity.magnitude;
+                retainedSpeedDirection = 1f;
             }
+            // ------------------ MID-AIR BRAKE / REVERSE ------------------
             else if (moveInput < -0.1f)
             {
-                Vector3 force = transform.forward * moveInput * currentAcceleration;
-                rb.AddForce(force, ForceMode.Acceleration);
+                if (Vector3.Dot(rb.velocity, transform.forward) > reverseEngageSpeed)
+                {
+                    rb.velocity = Vector3.MoveTowards(rb.velocity, Vector3.zero, currentAcceleration * Time.fixedDeltaTime);
+                    retainedSpeed = rb.velocity.magnitude;
+                    return;
+                }
+
+                rb.AddForce(transform.forward * moveInput * currentAcceleration, ForceMode.Acceleration);
                 retainedSpeed = rb.velocity.magnitude;
+                retainedSpeedDirection = -1f;
             }
             else
             {
                 if (rb.velocity.magnitude < retainedSpeed)
-                    rb.velocity = rb.velocity.normalized * retainedSpeed;
+                {
+                    Vector3 dir = (retainedSpeedDirection < 0) ? -transform.forward : transform.forward;
+                    rb.velocity = dir * retainedSpeed;
+                }
             }
         }
 
-        // Clamp speed
+        // Clamp max speed
         float currentMaxSpeed = speed * weightFactor * (isBoosting ? boostMultiplier : 1f);
         if (rb.velocity.magnitude > currentMaxSpeed)
             rb.velocity = rb.velocity.normalized * currentMaxSpeed;
@@ -248,13 +266,12 @@ public class PlayerKartController : MonoBehaviour
         float turnAngle = turnInput * adjustedHandling * Time.fixedDeltaTime;
         rb.MoveRotation(rb.rotation * Quaternion.Euler(0, turnAngle, 0));
 
-        // Velocity Fix
+        // Keep velocity aligned with direction (fixes drifting sideways)
         if (rb.velocity.magnitude > 0.1f)
         {
-            rb.velocity = transform.forward * rb.velocity.magnitude;
+            Vector3 dir = (retainedSpeedDirection < 0) ? -transform.forward : transform.forward;
+            rb.velocity = dir * rb.velocity.magnitude;
         }
-
-
     }
 
     void HandleCamera()
@@ -350,5 +367,3 @@ public class PlayerKartController : MonoBehaviour
         isShaking = false;
     }
 }
-
-
