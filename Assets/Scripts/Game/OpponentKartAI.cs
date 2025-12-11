@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.TextCore;
 
 [RequireComponent(typeof(Rigidbody))]
 public class OpponentKartAI : MonoBehaviour
@@ -19,14 +18,17 @@ public class OpponentKartAI : MonoBehaviour
     public float slopeFactor = 1f;
     public float groundForce = 50f;
 
+    [Header("AI Weight")]
+    public float AIWeight;
+
+    [Header("Kart Visuals")]
+    public MeshRenderer bathtubRenderer;
+
     private Rigidbody rb;
 
     private float brakingZoneSpeed = -1f;
 
-    [Header("Race Control")]
-    public bool canDrive = false;
 
-    private RacerInfo racerInfo;
 
     void Start()
     {
@@ -35,31 +37,26 @@ public class OpponentKartAI : MonoBehaviour
         rb.interpolation = RigidbodyInterpolation.Interpolate;
         rb.collisionDetectionMode = CollisionDetectionMode.Continuous;
 
-
         waypoints = waypointContainer.waypoints;
         currentWaypoint = 0;
 
-        currentWaypoint++;
-        if (currentWaypoint >= waypoints.Count)
+        AIWeight = Random.Range(0.8f, 1.3f);
+        RandomizeBodyColor();
+    }
+
+    void RandomizeBodyColor()
+    {
+        if (bathtubRenderer != null)
         {
-            currentWaypoint = 0;
-
-            if (!racerInfo.hasFinished)
-                racerInfo.currentLap++;
+            Color randomColor = new Color(Random.Range(0.2f, 1f), Random.Range(0.2f, 1f), Random.Range(0.2f, 1f));
+            bathtubRenderer.material = new Material(bathtubRenderer.material);
+            bathtubRenderer.material.color = randomColor;
         }
-
-        racerInfo = GetComponent<RacerInfo>();
-        racerInfo.totalLaps = PlayerPrefs.GetInt("SelectedLapCount", 3);
+       
     }
 
     void FixedUpdate()
     {
-        if (!canDrive)
-        {
-            rb.velocity = Vector3.zero;
-            return;
-        }
-
         if (waypoints != null && waypoints.Count > 0)
         {
             HandleWaypointMovement();
@@ -68,15 +65,6 @@ public class OpponentKartAI : MonoBehaviour
         {
             HandleSlopeMovement();
         }
-
-        // Sync AI progress to RacerInfo
-        if (racerInfo != null)
-        {
-            racerInfo.currentWaypoint = currentWaypoint;
-            racerInfo.distanceToNext =
-                Vector3.Distance(transform.position, waypoints[currentWaypoint].position);
-        }
-
     }
 
     void HandleWaypointMovement()
@@ -113,7 +101,8 @@ public class OpponentKartAI : MonoBehaviour
         }
 
         //Acceleration
-        Vector3 force = desiredDireection * acceleration;
+        float currentAcceleration = acceleration * (1f / AIWeight);
+        Vector3 force = desiredDireection * currentAcceleration;
         rb.AddForce(force, ForceMode.Acceleration);
 
         // Speed limiting
@@ -164,7 +153,8 @@ public class OpponentKartAI : MonoBehaviour
                     adjustment = slopeFactor; // Downhill (speed up)
             }
 
-            Vector3 force = slopeForward * acceleration * adjustment;
+            float currentAcceleration = acceleration * (1f / AIWeight);
+            Vector3 force = slopeForward * currentAcceleration * adjustment;
             rb.AddForce(force, ForceMode.Acceleration);
 
             if (rb.velocity.magnitude > maxSpeed)
