@@ -1,26 +1,22 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using TMPro;
 
+
+// Determines and displays race position based on lap count, waypoint index, and remaining distance to next waypoint.
 public class RacePositionManager : MonoBehaviour
 {
+    [Header("UI")]
+    [Tooltip("UI text displaying the player's current place.")]
     public TMP_Text positionText;
 
+    // List of all racers currently participating
     private List<RacerInfo> racers = new List<RacerInfo>();
 
     void Start()
     {
-        // FIND ALL RACERS IN THE SCENE
-        racers = FindObjectsOfType<RacerInfo>().ToList();
-
-        if (racers.Count == 0)
-            Debug.LogError("NO RACERS FOUND! Add RacerInfo to all karts.");
-    }
-    public void RefreshRacers()
-    {
-        racers = FindObjectsOfType<RacerInfo>().ToList();
-        Debug.Log("Racers refreshed! Count = " + racers.Count);
+        DiscoverRacers();
     }
 
     void Update()
@@ -29,26 +25,45 @@ public class RacePositionManager : MonoBehaviour
         UpdatePositionDisplay();
     }
 
-    void SortRacers()
+    // Builds the racer list by pulling all RacerInfo components in the scene.
+    private void DiscoverRacers()
     {
-        racers = racers.OrderByDescending(r => r.currentLap)
-                       .ThenByDescending(r => r.currentWaypoint)
-                       .ThenBy(r => r.distanceToNext)
-                       .ToList();
+        racers = FindObjectsOfType<RacerInfo>().ToList();
+
+        if (racers.Count == 0)
+            Debug.LogError("RacePositionManager: No racers found! Ensure each kart has a RacerInfo component.");
     }
 
-    void UpdatePositionDisplay()
+    public void RefreshRacers()
+    {
+        DiscoverRacers();
+        Debug.Log($"Racers refreshed. Count = {racers.Count}");
+    }
+
+
+    // Sorts racers from leading → last place based on race progression.
+    // Order: highest lap → highest waypoint → shortest distance to next waypoint.
+    private void SortRacers()
+    {
+        racers = racers
+            .OrderByDescending(r => r.currentLap)
+            .ThenByDescending(r => r.currentWaypoint)
+            .ThenBy(r => r.distanceToNext)
+            .ToList();
+    }
+
+    /// Updates the player’s on-screen race position text.
+    private void UpdatePositionDisplay()
     {
         RacerInfo player = racers.FirstOrDefault(r => r.isPlayer);
 
         if (player == null)
         {
-            Debug.LogError("PLAYER NOT FOUND IN RACER LIST!");
+            Debug.LogError("RacePositionManager: Player not found in racer list.");
             return;
         }
 
         int position = racers.IndexOf(player) + 1;
-
-        positionText.text = "Place: " + position + " / " + racers.Count;
+        positionText.text = $"Place: {position} / {racers.Count}";
     }
 }

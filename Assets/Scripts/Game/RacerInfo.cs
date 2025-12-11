@@ -1,5 +1,7 @@
 using UnityEngine;
 
+// Stores all race-related state for a racer (player or AI).
+// Also connects to the assigned WaypointContainer for track logic.
 public class RacerInfo : MonoBehaviour
 {
     [Header("Identity")]
@@ -7,66 +9,95 @@ public class RacerInfo : MonoBehaviour
     public bool isPlayer = false;
 
     [Header("Race Progress")]
-    public int currentLap = 0;         // 0-based
+    [Tooltip("Current completed laps. 0-based index.")]
+    public int currentLap = 0;
+
+    [Tooltip("Total number of laps in this race.")]
     public int totalLaps = 3;
-    public int currentWaypoint = 0;    // waypoint index
+
+    [Tooltip("Current active waypoint index.")]
+    public int currentWaypoint = 0;
+
+    [Tooltip("Distance to the upcoming waypoint.")]
     public float distanceToNext = 0f;
+
     public bool hasFinished = false;
 
+
+    // Waypoint container controlling track layout. (AI overrides this if needed.)
     public WaypointContainer waypointContainer { get; private set; }
 
-    OpponentKartAI ai;
-    Transform tr;
+    private OpponentKartAI ai;
+    private Transform tr;
 
     void Awake()
     {
         tr = transform;
         ai = GetComponent<OpponentKartAI>();
 
-            waypointContainer = FindFirstObjectByType<WaypointContainer>();  
+        // Auto-grab existing waypoint container in scene
+        waypointContainer = FindFirstObjectByType<WaypointContainer>();
 
-        // Get total laps from Track Selection
+        // Load lap count chosen at track selection menu
         totalLaps = PlayerPrefs.GetInt("SelectedLapCount", totalLaps);
 
-        // Use AI's waypointContainer if available
+        // AI overrides waypointContainer if it uses a specific path
         if (ai != null)
             waypointContainer = ai.waypointContainer;
 
         if (waypointContainer == null)
-            Debug.LogError("RacerInfo: No WaypointContainer found!");
+            Debug.LogError("RacerInfo: No WaypointContainer found in the scene.");
     }
 
     void Update()
     {
-        if (waypointContainer == null ||
-            waypointContainer.waypoints == null ||
-            waypointContainer.waypoints.Count == 0)
+        if (!HasValidWaypoints())
             return;
 
+        UpdateWaypointProgress();
+    }
+
+
+    // Ensures the track waypoint list is valid before processing.
+    private bool HasValidWaypoints()
+    {
+        return waypointContainer != null &&
+               waypointContainer.waypoints != null &&
+               waypointContainer.waypoints.Count > 0;
+    }
+
+
+    // Updates the current waypoint index and distance.
+    // AI uses its own internal waypoint index; player uses nearest waypoint detection.
+
+    private void UpdateWaypointProgress()
+    {
         var list = waypointContainer.waypoints;
 
+        // AI progression index
         if (ai != null)
         {
             currentWaypoint = Mathf.Clamp(ai.currentWaypoint, 0, list.Count - 1);
             distanceToNext = Vector3.Distance(tr.position, list[currentWaypoint].position);
+            return;
         }
-        else
+
+        // Player: find nearest waypoint
+        int bestIndex = 0;
+        float closestDist = float.MaxValue;
+
+        for (int i = 0; i < list.Count; i++)
         {
-            int bestIndex = 0;
-            float best = float.MaxValue;
+            float sqrDist = (tr.position - list[i].position).sqrMagnitude;
 
-            for (int i = 0; i < list.Count; i++)
+            if (sqrDist < closestDist)
             {
-                float d = (tr.position - list[i].position).sqrMagnitude;
-                if (d < best)
-                {
-                    best = d;
-                    bestIndex = i;
-                }
+                closestDist = sqrDist;
+                bestIndex = i;
             }
-
-            currentWaypoint = bestIndex;
-            distanceToNext = Mathf.Sqrt(best);
         }
+
+        currentWaypoint = bestIndex;
+        distanceToNext = Mathf.Sqrt(closestDist);
     }
 }
