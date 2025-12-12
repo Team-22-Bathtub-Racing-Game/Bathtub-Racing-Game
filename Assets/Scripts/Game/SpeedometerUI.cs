@@ -49,5 +49,12 @@ public class SpeedometerUI : MonoBehaviour
         float speedMPH = playerRB.velocity.magnitude * ToMPH;
         speedText.text = speedMPH.ToString("000");
     }
+        public void UpdateSpeedometerFromVelocity(Vector3 velocity)
+    {
+        float speedMPH = velocity.magnitude * ToMPH;
+        speedText.text = speedMPH.ToString("000");
+    }
+
 }
+
 

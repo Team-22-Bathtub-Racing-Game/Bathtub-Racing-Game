@@ -9,15 +9,18 @@ public class RaceTimer : MonoBehaviour
 
     void Update()
     {
-        if (raceActive)
-        {
-            raceTime += Time.deltaTime;
-            UpdateTimerDisplay();
-        }
+        if (!raceActive)
+            return;
+
+        raceTime += Time.deltaTime;
+        UpdateTimerDisplay();
     }
 
     void UpdateTimerDisplay()
     {
+        if (timerText == null)
+            return;
+
         int minutes = Mathf.FloorToInt(raceTime / 60);
         int seconds = Mathf.FloorToInt(raceTime % 60);
         int milliseconds = Mathf.FloorToInt((raceTime * 100) % 100);
