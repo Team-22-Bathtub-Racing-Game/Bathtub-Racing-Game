@@ -4,13 +4,7 @@
 
 
 
-Beginning in the 1960s and running until the early 1990s, bathtub races were a central part of student
-
-life at Southern Polytechnic State University (SPSU) as they fostered a healthy blend of creativity and
-
-camaraderie from both their students and onlookers. Even after the annual races ended, they have
-
-remained a fondly remembered part of SPSU.
+Beginning in the 1960s and running until the early 1990s, bathtub races were a central part of student life at Southern Polytechnic State University (SPSU) as they fostered a healthy blend of creativity and camaraderie from both their students and onlookers. Even after the annual races ended, they have remained a fondly remembered part of SPSU.
 
 
 
